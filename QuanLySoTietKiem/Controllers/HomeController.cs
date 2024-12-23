@@ -4,6 +4,7 @@ using QuanLySoTietKiem.Models;
 
 namespace QuanLySoTietKiem.Controllers
 {
+    
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -19,6 +20,11 @@ namespace QuanLySoTietKiem.Controllers
         }
 
         public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        public IActionResult Contact()
         {
             return View();
         }

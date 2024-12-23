@@ -397,17 +397,18 @@ namespace QuanLySoTietKiem.Migrations
                     b.Property<decimal>("SoDuSoTietKiem")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("TrangThai")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("TrangThai")
+                        .HasColumnType("bit");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("MaSoTietKiem");
 
                     b.HasIndex("MaLoaiSo");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("SoTietKiems");
                 });
@@ -515,7 +516,15 @@ namespace QuanLySoTietKiem.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("QuanLySoTietKiem.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("LoaiSoTietKiem");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("QuanLySoTietKiem.Models.LoaiSoTietKiem", b =>
