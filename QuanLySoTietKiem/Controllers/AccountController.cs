@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.V4.Pages.Account.Internal;
 using Microsoft.AspNetCore.Mvc;
 using QuanLySoTietKiem.Models;
+using QuanLySoTietKiem.Models.AccountModels.ChangePasswordModel;
+using QuanLySoTietKiem.Models.AccountModels.ForgotPassword;
+using QuanLySoTietKiem.Services.Interfaces;
 using LoginModel = QuanLySoTietKiem.Models.AccountModels.LoginModel.LoginModel;
 using RegisterModel = QuanLySoTietKiem.Models.AccountModels.RegisterrModel.RegisterModel;
 
@@ -10,17 +12,23 @@ namespace QuanLySoTietKiem.Controllers
     public class AccountController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager; 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IAccountService _accountService;
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IAccountService accountService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _accountService = accountService;
         }
 
-        [HttpGet] 
+        [HttpGet]
         public IActionResult Login()
         {
-            return View(); 
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                return RedirectToAction("Index", "User");
+            }
+            return View();
         }
 
         [HttpPost]
@@ -59,7 +67,7 @@ namespace QuanLySoTietKiem.Controllers
 
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "User");
                 }
                 else if (result.IsLockedOut)
                 {
@@ -71,13 +79,16 @@ namespace QuanLySoTietKiem.Controllers
                 }
             }
 
-            return View(model);
+            return RedirectToAction("Index", "User");
         }
-
 
         [HttpGet]
         public IActionResult Register()
         {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                return RedirectToAction("Index", "User");
+            }
             return View();
         }
 
@@ -95,12 +106,20 @@ namespace QuanLySoTietKiem.Controllers
                     CCCD = model.CCCD,
                     SoDuTaiKhoan = model.SoDuTaiKhoan,
                     PhoneNumber = model.PhoneNumber,
-                    PhoneNumberConfirmed = true, 
+                    PhoneNumberConfirmed = true,
                     EmailConfirmed = true,
                     LockoutEnabled = true,
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
+
+                //assign role 
+                if (result.Succeeded)
+                {
+                    Console.WriteLine("User created successfully");
+                    await _userManager.AddToRoleAsync(user, "User");
+                }
+
 
                 if (result.Succeeded)
                 {
@@ -115,5 +134,46 @@ namespace QuanLySoTietKiem.Controllers
             }
             return View(model);
         }
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var currentUser = await _userManager.GetUserAsync(User);
+                var result = await _userManager.ChangePasswordAsync(currentUser, model.CurrentPassword, model.NewPassword);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Dashboard");
+                }
+                //Add errors to ModelState
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+            }
+            return View(model);
+        }
+        //Logout 
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Login", "Account");
+        }
+        //Forgot password 
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+        // Forgot password
+
+
     }
 }

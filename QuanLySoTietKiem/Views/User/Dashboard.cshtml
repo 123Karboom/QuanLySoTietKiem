@@ -1,52 +1,40 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-    ViewData["Title"] = "Dashboard";
+﻿@{
+    ViewData["itle"] = "Dashboard";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+
+    <div class="container mt-5">
+
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-wallet2 fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Savings Accounts</h5>
+                        <p class="card-text">View and manage your savings accounts.</p>
+                        <a href="/Savings/New" class="btn btn-primary">Open New Saving Account</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-person-circle fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Profile</h5>
+                        <p class="card-text">View and edit your profile information.</p>
+                        <a href="/User/Profile" class="btn btn-primary">View Profile</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="bi bi-gear fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Settings</h5>
+                        <p class="card-text">Adjust your account settings and preferences.</p>
+                        <a href="/User/Settings" class="btn btn-primary">Account Settings</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 }
-<h2>Welcome, [User's Name]</h2>
-
-<div class="overview">
-    <div>
-        <h4>Total Balance</h4>
-        <p>10,000,000 VND</p>
-    </div>
-    <div>
-        <h4>Available Balance</h4>
-        <p>8,000,000 VND</p>
-    </div>
-    <div>
-        <h4>Saving Accounts</h4>
-        <p>3 Accounts</p>
-    </div>
-</div>
-
-<h3>Your Saving Accounts</h3>
-<table>
-    <thead>
-        <tr>
-            <th>Account ID</th>
-            <th>Type</th>
-            <th>Balance</th>
-            <th>Interest Rate</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>123456</td>
-            <td>12-month Fixed</td>
-            <td>5,000,000 VND</td>
-            <td>6%</td>
-            <td>Active</td>
-        </tr>
-    </tbody>
-</table>
-
-<h3>Recent Transactions</h3>
-<ul>
-    <li>25/12/2024: Deposited 1,000,000 VND (Completed)</li>
-    <li>22/12/2024: Withdrew 500,000 VND (Completed)</li>
-</ul>
-
-<a href="/Savings/New" class="btn btn-primary">Open New Saving Account</a>

@@ -10,12 +10,17 @@ namespace QuanLySoTietKiem.Models
 
         [Required]
         public int MaLoaiSo { get; set; }
-        public DateTime NgayGhi { get; set; }
+        [Required]
+        public DateTime Ngay { get; set; }
 
         [Required]
-        public decimal SoTienGui { get; set; }
+        public decimal TongTienGui { get; set; }
 
+        [Required]
+        public decimal TongTienRut { get; set; }
+        [Required]
+        public DateTime NgayTaoBaoCao { get; set; }
         [ForeignKey("MaLoaiSo")]
-        public virtual LoaiSoTietKiem LoaiSoTietKiem { get; set; }
+        public virtual LoaiSoTietKiem? LoaiSoTietKiem { get; set; }
     }
 }

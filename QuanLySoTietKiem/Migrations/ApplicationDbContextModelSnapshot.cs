@@ -102,12 +102,10 @@ namespace QuanLySoTietKiem.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderKey")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -144,12 +142,10 @@ namespace QuanLySoTietKiem.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
@@ -253,10 +249,18 @@ namespace QuanLySoTietKiem.Migrations
                     b.Property<int>("MaLoaiSo")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("NgayGhi")
+                    b.Property<DateTime>("Ngay")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("SoTienGui")
+                    b.Property<DateTime>("NgayTaoBaoCao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("TongTienGui")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TongTienRut")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("MaBaoCaoNgay");
@@ -275,26 +279,75 @@ namespace QuanLySoTietKiem.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaBaoCaoThang"));
 
                     b.Property<decimal>("ChenhLech")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("MaLoaiSo")
                         .HasColumnType("int");
 
+                    b.Property<int>("Nam")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("NgayTaoBaoCao")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("SoLuongDong")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("SoTienGui")
+                    b.Property<int>("SoLuongMo")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Thang")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TongSoTienGui")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("Thang")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<decimal>("TongSoTienRut")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("MaBaoCaoThang");
 
                     b.HasIndex("MaLoaiSo");
 
                     b.ToTable("BaoCaoThangs");
+                });
+
+            modelBuilder.Entity("QuanLySoTietKiem.Models.HinhThucDenHan", b =>
+                {
+                    b.Property<int>("MaHinhThucDenHan")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaHinhThucDenHan"));
+
+                    b.Property<string>("TenHinhThucDenHan")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("MaHinhThucDenHan");
+
+                    b.ToTable("HinhThucDenHan");
+
+                    b.HasData(
+                        new
+                        {
+                            MaHinhThucDenHan = 1,
+                            TenHinhThucDenHan = "Rút hết"
+                        },
+                        new
+                        {
+                            MaHinhThucDenHan = 2,
+                            TenHinhThucDenHan = "Quay vòng gốc"
+                        },
+                        new
+                        {
+                            MaHinhThucDenHan = 3,
+                            TenHinhThucDenHan = "Quay vòng cả gốc và lãi"
+                        });
                 });
 
             modelBuilder.Entity("QuanLySoTietKiem.Models.LoaiSoTietKiem", b =>
@@ -308,10 +361,11 @@ namespace QuanLySoTietKiem.Migrations
                     b.Property<int>("KyHan")
                         .HasColumnType("int");
 
-                    b.Property<float>("LaiSuat")
-                        .HasColumnType("real");
+                    b.Property<double>("LaiSuat")
+                        .HasColumnType("float");
 
                     b.Property<decimal>("SoTienGuiToiThieu")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("TenLoaiSo")
@@ -341,6 +395,7 @@ namespace QuanLySoTietKiem.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("SoTienGui")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("MaPhieuGui");
@@ -365,6 +420,7 @@ namespace QuanLySoTietKiem.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("SoTienRut")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("MaPhieuRut");
@@ -382,8 +438,20 @@ namespace QuanLySoTietKiem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaSoTietKiem"));
 
-                    b.Property<float>("LaiSuatApDung")
-                        .HasColumnType("real");
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("LaiSuatApDung")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("LaiSuatKyHan")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("MaHinhThucDenHan")
+                        .HasColumnType("int");
 
                     b.Property<int>("MaLoaiSo")
                         .HasColumnType("int");
@@ -395,6 +463,11 @@ namespace QuanLySoTietKiem.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("SoDuSoTietKiem")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("SoTienGui")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("TrangThai")
@@ -405,6 +478,8 @@ namespace QuanLySoTietKiem.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("MaSoTietKiem");
+
+                    b.HasIndex("MaHinhThucDenHan");
 
                     b.HasIndex("MaLoaiSo");
 
@@ -510,6 +585,12 @@ namespace QuanLySoTietKiem.Migrations
 
             modelBuilder.Entity("QuanLySoTietKiem.Models.SoTietKiem", b =>
                 {
+                    b.HasOne("QuanLySoTietKiem.Models.HinhThucDenHan", "HinhThucDenHan")
+                        .WithMany("SoTietKiems")
+                        .HasForeignKey("MaHinhThucDenHan")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("QuanLySoTietKiem.Models.LoaiSoTietKiem", "LoaiSoTietKiem")
                         .WithMany("SoTietKiems")
                         .HasForeignKey("MaLoaiSo")
@@ -522,9 +603,16 @@ namespace QuanLySoTietKiem.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("HinhThucDenHan");
+
                     b.Navigation("LoaiSoTietKiem");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("QuanLySoTietKiem.Models.HinhThucDenHan", b =>
+                {
+                    b.Navigation("SoTietKiems");
                 });
 
             modelBuilder.Entity("QuanLySoTietKiem.Models.LoaiSoTietKiem", b =>

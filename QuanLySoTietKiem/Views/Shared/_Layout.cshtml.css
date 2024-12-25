@@ -6,7 +6,12 @@ a.navbar-brand {
   text-align: center;
   word-break: break-all;
 }
-
+body {
+    min-height: 100vh;
+    position: relative;
+    margin: 0;
+    padding-bottom: 60px; /* Height of the footer */
+}
 a {
   color: #0077cc;
 }
@@ -43,6 +48,7 @@ button.accept-policy {
   position: absolute;
   bottom: 0;
   width: 100%;
-  white-space: nowrap;
+  height: 60px;
   line-height: 60px;
+  background-color: #f8f9fa;
 }
