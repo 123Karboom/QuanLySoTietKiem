@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace QuanLySoTietKiem.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitialDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -61,10 +61,10 @@ namespace QuanLySoTietKiem.Migrations
                     MaLoaiSo = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TenLoaiSo = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LaiSuat = table.Column<float>(type: "real", nullable: false),
+                    LaiSuat = table.Column<double>(type: "float", nullable: false),
                     KyHan = table.Column<int>(type: "int", nullable: false),
                     ThoiGianGuiToiThieu = table.Column<int>(type: "int", nullable: false),
-                    SoTienGuiToiThieu = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    SoTienGuiToiThieu = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -117,8 +117,8 @@ namespace QuanLySoTietKiem.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    ProviderKey = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
@@ -162,8 +162,8 @@ namespace QuanLySoTietKiem.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -184,8 +184,10 @@ namespace QuanLySoTietKiem.Migrations
                     MaBaoCaoNgay = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     MaLoaiSo = table.Column<int>(type: "int", nullable: false),
-                    NgayGhi = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    SoTienGui = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Ngay = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TongTienGui = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    TongTienRut = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    NgayTaoBaoCao = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -205,10 +207,13 @@ namespace QuanLySoTietKiem.Migrations
                     MaBaoCaoThang = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     MaLoaiSo = table.Column<int>(type: "int", nullable: false),
-                    Thang = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Thang = table.Column<int>(type: "int", nullable: false),
+                    Nam = table.Column<int>(type: "int", nullable: false),
                     SoLuongDong = table.Column<int>(type: "int", nullable: false),
-                    SoTienGui = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ChenhLech = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    TongSoTienGui = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    TongSoTienRut = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    NgayTaoBaoCao = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ChenhLech = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -227,10 +232,13 @@ namespace QuanLySoTietKiem.Migrations
                 {
                     MaSoTietKiem = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     MaLoaiSo = table.Column<int>(type: "int", nullable: false),
-                    SoDuSoTietKiem = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    SoDuSoTietKiem = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    SoTienGui = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    LaiSuatKyHan = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     TrangThai = table.Column<bool>(type: "bit", nullable: false),
-                    LaiSuatApDung = table.Column<float>(type: "real", nullable: false),
+                    LaiSuatApDung = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     NgayMoSo = table.Column<DateTime>(type: "datetime2", nullable: false),
                     NgayDongSo = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
@@ -260,7 +268,7 @@ namespace QuanLySoTietKiem.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     MaSoTietKiem = table.Column<int>(type: "int", nullable: false),
                     NgayGui = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    SoTienGui = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    SoTienGui = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -281,7 +289,7 @@ namespace QuanLySoTietKiem.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     MaSoTietKiem = table.Column<int>(type: "int", nullable: false),
                     NgayRut = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    SoTienRut = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    SoTienRut = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {

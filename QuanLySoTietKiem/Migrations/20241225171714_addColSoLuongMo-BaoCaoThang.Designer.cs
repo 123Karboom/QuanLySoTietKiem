@@ -12,8 +12,8 @@ using QuanLySoTietKiem.Data;
 namespace QuanLySoTietKiem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241223063253_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20241225171714_addColSoLuongMo-BaoCaoThang")]
+    partial class addColSoLuongMoBaoCaoThang
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -105,12 +105,10 @@ namespace QuanLySoTietKiem.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderKey")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -147,12 +145,10 @@ namespace QuanLySoTietKiem.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
@@ -256,10 +252,18 @@ namespace QuanLySoTietKiem.Migrations
                     b.Property<int>("MaLoaiSo")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("NgayGhi")
+                    b.Property<DateTime>("Ngay")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("SoTienGui")
+                    b.Property<DateTime>("NgayTaoBaoCao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("TongTienGui")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TongTienRut")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("MaBaoCaoNgay");
@@ -278,20 +282,34 @@ namespace QuanLySoTietKiem.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaBaoCaoThang"));
 
                     b.Property<decimal>("ChenhLech")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("MaLoaiSo")
                         .HasColumnType("int");
 
+                    b.Property<int>("Nam")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("NgayTaoBaoCao")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("SoLuongDong")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("SoTienGui")
+                    b.Property<int>("SoLuongMo")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Thang")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TongSoTienGui")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("Thang")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<decimal>("TongSoTienRut")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("MaBaoCaoThang");
 
@@ -311,10 +329,11 @@ namespace QuanLySoTietKiem.Migrations
                     b.Property<int>("KyHan")
                         .HasColumnType("int");
 
-                    b.Property<float>("LaiSuat")
-                        .HasColumnType("real");
+                    b.Property<double>("LaiSuat")
+                        .HasColumnType("float");
 
                     b.Property<decimal>("SoTienGuiToiThieu")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("TenLoaiSo")
@@ -344,6 +363,7 @@ namespace QuanLySoTietKiem.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("SoTienGui")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("MaPhieuGui");
@@ -368,6 +388,7 @@ namespace QuanLySoTietKiem.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("SoTienRut")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("MaPhieuRut");
@@ -385,8 +406,17 @@ namespace QuanLySoTietKiem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaSoTietKiem"));
 
-                    b.Property<float>("LaiSuatApDung")
-                        .HasColumnType("real");
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("LaiSuatApDung")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("LaiSuatKyHan")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("MaLoaiSo")
                         .HasColumnType("int");
@@ -398,6 +428,11 @@ namespace QuanLySoTietKiem.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("SoDuSoTietKiem")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("SoTienGui")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("TrangThai")

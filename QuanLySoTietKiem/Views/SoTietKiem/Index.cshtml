@@ -1,0 +1,69 @@
+﻿@model IEnumerable<QuanLySoTietKiem.Models.SoTietKiemModel>
+@{
+    ViewData["Title"] = "Danh sách sổ tiết kiệm";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-list-ul fa-2x me-2"></i>
+                    <h3 class="mb-0">Danh Sách Sổ Tiết Kiệm</h3>
+                </div>
+                <a asp-action="OpenSavingsAccount" class="btn btn-light">
+                    <i class="bi bi-plus-circle me-2"></i>Mở Sổ Mới
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (!Model.Any())
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox display-1 text-muted"></i>
+                    <p class="lead mt-3">Bạn chưa có sổ tiết kiệm nào</p>
+                    <a asp-action="OpenSavingsAccount" class="btn btn-primary mt-3">
+                        <i class="bi bi-plus-circle me-2"></i>Mở Sổ Tiết Kiệm Ngay
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Số Sổ</th>
+                                <th>Số Tiền Gửi</th>
+                                <th>Kỳ Hạn</th>
+                                <th>Lãi Suất</th>
+                                <th>Ngày Mở Sổ</th>
+                                <th>Ngày Đáo Hạn</th>
+                                <th>Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.Id</td>
+                                    <td>@item.SoTienGui.ToString("N0") VNĐ</td>
+                                    <td>@item.KyHan tháng</td>
+                                    <td>@(item.LaiSuat * 100)%</td>
+                                    <td>@item.NgayMoSo.ToString("dd/MM/yyyy")</td>
+                                    <td>@item.NgayMoSo.AddMonths(item.KyHan).ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-info">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
