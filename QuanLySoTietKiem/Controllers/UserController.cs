@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using QuanLySoTietKiem.Models;
+using QuanLySoTietKiem.Models.AccountModels.ChangePasswordModel;
+using QuanLySoTietKiem.Services.Interfaces;
 
 
 namespace QuanLySoTietKiem.Controllers
@@ -10,11 +12,14 @@ namespace QuanLySoTietKiem.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
-        public UserController(ILogger<UserController> logger, UserManager<ApplicationUser> userManager)
+        private readonly ISoTietKiemService _soTietKiemService;
+        public UserController(ILogger<UserController> logger, UserManager<ApplicationUser> userManager, ISoTietKiemService soTietKiemService)
         {
             _logger = logger;
             _userManager = userManager;
+            _soTietKiemService = soTietKiemService;
         }
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -36,7 +41,11 @@ namespace QuanLySoTietKiem.Controllers
             {
                 return RedirectToAction("Login", "Account");
             }
+            // Hiển thị tổng số sổ tiết kiệm của người dùng
+            var count = await _soTietKiemService.CountSoTietKiem(currentUser.Id);
             ViewBag.UserName = currentUser.FullName;
+            ViewBag.ThongBao = "Chào mừng " + currentUser.FullName + " đã quay trở lại hệ thống 😊";
+            ViewBag.CountSoTietKiem = count;
             return View();
         }
 
@@ -87,6 +96,33 @@ namespace QuanLySoTietKiem.Controllers
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
+                }
+            }
+            return View(model);
+        }
+        [HttpGet]
+        [Authorize(Roles = "User")]
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var currentUser = await _userManager.GetUserAsync(User) ?? throw new Exception("User not found");
+                var result = await _userManager.ChangePasswordAsync(currentUser, model.CurrentPassword, model.NewPassword);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Dashboard");
+                }
+                //Add errors to ModelState
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
                 }
             }
             return View(model);

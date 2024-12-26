@@ -8,14 +8,14 @@ namespace QuanLySoTietKiem.Data
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
-        
+
         public DbSet<LoaiSoTietKiem> LoaiSoTietKiems { get; set; }
         public DbSet<SoTietKiem> SoTietKiems { get; set; }
         public DbSet<BaoCaoNgay> BaoCaoNgays { get; set; }
         public DbSet<BaoCaoThang> BaoCaoThangs { get; set; }
         public DbSet<PhieuRutTien> PhieuRutTiens { get; set; }
         public DbSet<PhieuGuiTien> PhieuGuiTiens { get; set; }
-
+        public DbSet<HinhThucDenHan> HinhThucDenHans { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -38,10 +38,10 @@ namespace QuanLySoTietKiem.Data
 
             modelBuilder.Entity<HinhThucDenHan>().HasData(
                 new HinhThucDenHan() { MaHinhThucDenHan = 1, TenHinhThucDenHan = "Rút hết" },
-                new HinhThucDenHan() {MaHinhThucDenHan = 2, TenHinhThucDenHan = "Quay vòng gốc"},
-                new HinhThucDenHan() {MaHinhThucDenHan = 3, TenHinhThucDenHan = "Quay vòng cả gốc và lãi"}
+                new HinhThucDenHan() { MaHinhThucDenHan = 2, TenHinhThucDenHan = "Quay vòng gốc" },
+                new HinhThucDenHan() { MaHinhThucDenHan = 3, TenHinhThucDenHan = "Quay vòng cả gốc và lãi" }
             );
-            
+
         }
     }
 }

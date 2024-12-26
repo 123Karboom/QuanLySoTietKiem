@@ -8,16 +8,16 @@
   <div class="row justify-content-center">
     <div class="col-md-8">
       <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-          <div class="d-flex align-items-center">
+        <div class="card-header bg-success text-white">
+          <div class="d-flex align-items-center justify-content-center">
             <i class="bi bi-piggy-bank-fill fa-2x me-2"></i>
-            <h3 class="mb-0">Mở Sổ Tiết Kiệm</h3>
+            <h3 class="mb-0 text-center">Mở Sổ Tiết Kiệm</h3>
           </div>
         </div>
         <div class="card-body">
           <div class="alert alert-info">
             <i class="bi bi-info-circle-fill me-2"></i>
-            Số dư hiện tại: <strong>@ViewBag.SoDuHienTai.ToString("N0") VNĐ</strong>
+              Số dư hiện tại: <strong>@ViewBag.SoDuHienTai.ToString("N0") VNĐ</strong>
           </div>
 
           <form asp-action="OpenSavingsAccount" method="post">
@@ -25,28 +25,52 @@
 
             <div class="mb-3">
               <label asp-for="SoTienGui" class="form-label fw-bold text-primary">
-                <i class="bi bi-cash-stack me-2"></i>Số tiền gửi
+                <i class="bi bi-cash-stack me-2"></i> Số tiền gửi
               </label>
-              <input asp-for="SoTienGui" class="form-control" type="number" min="100000" />
+              <input asp-for="SoTienGui" class="form-control" type="number" min="1000000"
+                placeholder="Ví dụ: 1000000 và tối thiểu là 1000000" />
               <span asp-validation-for="SoTienGui" class="text-danger"></span>
             </div>
-
+            @* Code STK tự động tạo trong hệ thống *@
             <div class="mb-3">
-              <label asp-for="KyHan" class="form-label fw-bold text-primary">
+              <label asp-for="Code" class="form-label fw-bold text-primary">
+                <i class="bi bi-code-slash me-2"></i>Mã Sổ tiết kiệm (Tự động tạo trong hệ thống)
+              </label>
+              <input asp-for="Code" class="form-control" type="text" value="@ViewBag.CodeSTK" readonly />
+            </div>
+
+            @* <div class="mb-3">
+              <label asp-for="MaHinhThucDenHan" class="form-label fw-bold text-primary">
                 <i class="bi bi-calendar-event me-2"></i>Kỳ hạn
               </label>
-              <select asp-for="KyHan" class="form-select">
+              <select asp-for="MaHinhThucDenHan" class="form-select">
                 <option value="1">1 tháng (2%/năm)</option>
                 <option value="3">3 tháng (3%/năm)</option>
                 <option value="6">6 tháng (4%/năm)</option>
                 <option value="12">12 tháng (5%/năm)</option>
               </select>
-              <span asp-validation-for="KyHan" class="text-danger"></span>
+              <span asp-validation-for="MaHinhThucDenHan" class="text-danger"></span>
+            </div> *@
+
+            <div class="mb-3">
+              <label asp-for="MaHinhThucDenHan" class="form-label fw-bold text-primary">
+                <i class="bi bi-calendar-event me-2"></i>Hình thức đến hạn
+              </label>
+              <select asp-for="MaHinhThucDenHan" class="form-select" asp-items="ViewBag.HinhThucDenHanOptions"></select>
+              <span asp-validation-for="MaHinhThucDenHan" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+              <label asp-for="MaLoaiSo" class="form-label fw-bold text-primary">
+                <i class="bi bi-cash-stack me-2"></i>Kỳ hạn
+              </label>
+              <select asp-for="MaLoaiSo" class="form-select" asp-items="ViewBag.LoaiSoTietKiemOptions"></select>
+              <span asp-validation-for="MaLoaiSo" class="text-danger"></span>
             </div>
 
             <div class="text-center mt-4">
-              <button type="submit" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i>Mở Sổ Tiết Kiệm
+              <button type="submit" class="btn btn-success">
+                <i class="bi bi-save me-2"></i>Mở Sổ Tiết Kiệm
               </button>
               <a asp-action="Index" class="btn btn-outline-secondary ms-2">
                 <i class="bi bi-arrow-left me-2"></i>Quay Lại

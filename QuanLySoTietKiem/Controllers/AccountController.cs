@@ -134,31 +134,6 @@ namespace QuanLySoTietKiem.Controllers
             }
             return View(model);
         }
-        [HttpGet]
-        public IActionResult ChangePassword()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var currentUser = await _userManager.GetUserAsync(User);
-                var result = await _userManager.ChangePasswordAsync(currentUser, model.CurrentPassword, model.NewPassword);
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("Dashboard");
-                }
-                //Add errors to ModelState
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError("", error.Description);
-                }
-            }
-            return View(model);
-        }
         //Logout 
         [HttpPost]
         public async Task<IActionResult> Logout()

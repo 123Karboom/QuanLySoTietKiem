@@ -10,7 +10,7 @@ namespace QuanLySoTietKiem.Models
         [Required]
         public string? Code { get; set; } // STK001, STK002, STK003
         [Required]
-        public int MaLoaiSo { get; set; }  
+        public int MaLoaiSo { get; set; }
         [Required]
         public int MaHinhThucDenHan { get; set; }
         [Required]
@@ -25,17 +25,16 @@ namespace QuanLySoTietKiem.Models
         public decimal LaiSuatApDung { get; set; } // Lãi suất áp dụng
         [Required]
         public DateTime NgayMoSo { get; set; } // Ngày mở sổ
+        public DateTime? NgayDongSo { get; set; } // Ngày đóng sổ
         [Required]
-        public DateTime NgayDongSo { get; set; } // Ngày đóng sổ
-        [Required]
-        public string? UserId { get; set; } // Id người dùng
+        public string UserId { get; set; }
         [ForeignKey("MaLoaiSo")]
         public virtual LoaiSoTietKiem? LoaiSoTietKiem { get; set; }
         [ForeignKey("UserId")]
         public virtual ApplicationUser? User { get; set; }
         public virtual ICollection<PhieuRutTien>? PhieuRutTiens { get; set; }
         public virtual ICollection<PhieuGuiTien>? PhieuGuiTiens { get; set; }
-        [ForeignKey("MaHinhThucDenHan")] 
+        [ForeignKey("MaHinhThucDenHan")]
         public virtual HinhThucDenHan? HinhThucDenHan { get; set; }
     }
 }

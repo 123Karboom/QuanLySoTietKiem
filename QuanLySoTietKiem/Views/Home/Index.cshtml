@@ -1,24 +1,13 @@
 ﻿@{
-    ViewData["Title"] = "Trang Chào Mừng";
+    ViewData["Title"] = "Trang chủ";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
 <div class="min-h-screen bg-gray-50">
     <div class="container mx-auto px-4 py-16">
-        <div class="max-w-3xl mx-auto text-center">
-            <h1 class="text-4xl md:text-5xl font-bold text-blue-600 mb-6">
-                Welcome to the Saving System
-            </h1>
-
-            <p class="text-xl text-gray-600 mb-8">
-                Our system helps you manage your saving account easily and conveniently.
-            </p>
-
-            <div class="h-px bg-gray-200 w-full max-w-md mx-auto mb-8"></div>
-
-            <p class="text-gray-700 mb-8">
-                Please login or register an account to start using the service.
-            </p>
+        <div class="text-center text-red-500 alert alert-danger">@ViewBag.ThongBao</div>
+        <div class="flex justify-center">
+            <a href="@Url.Action("Login", "Account")" class="btn btn-primary mx-2">Đăng nhập</a>
+            <a href="@Url.Action("Register", "Account")" class="btn btn-success mx-2">Đăng ký</a>
         </div>
     </div>
 </div>

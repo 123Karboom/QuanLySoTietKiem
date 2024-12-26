@@ -112,8 +112,10 @@ head>
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-brand">
-            <i class="bi bi-bank2"></i>
-            <span>Saving System</span>
+            <a asp-controller="User" asp-action="Dashboard" class="nav-link">
+                <i class="bi bi-bank2"></i>
+                <span class="text-white">Trang quản lý</span>
+            </a>
         </div>
         @await Html.PartialAsync("_Sidebar")
     </aside>
@@ -129,13 +131,13 @@ head>
             <div class="ms-auto dropdown">
                 <a class="nav-link dropdown-toggle text-black d-flex align-items-center" href="#" id="userDropdown"
                     role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Hello, @ViewBag.UserName
+                    Xin chào, @ViewBag.UserName <i class="bi bi-person-fill me-2"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end bg-dark text-white" aria-labelledby="userDropdown">
                     <li>
                         <form asp-controller="Account" asp-action="Logout" method="post">
                             <button type="submit" class="dropdown-item text-white bg-dark">
-                                <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
                             </button>
                         </form>
                     </li>

@@ -20,8 +20,12 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddDefaultTokenProviders();
 
 
+
 //add services
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<ISoTietKiemService, SoTietKiemService>();
+builder.Services.AddScoped<UserManager<ApplicationUser>>(); 
+
 //Config Logging 
 builder.Services.AddLogging(loggingBuilder =>
 {
