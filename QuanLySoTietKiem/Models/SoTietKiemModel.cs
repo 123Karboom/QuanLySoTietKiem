@@ -5,31 +5,23 @@ namespace QuanLySoTietKiem.Models
 {
     public class SoTietKiemModel
     {
-        [Key]
-        public int Id { get; set; }
-
+        public int MaSoTietKiem { get; set; }
         [Required]
+        public string? Code { get; set; }
+        [Required(ErrorMessage = "UserId is required")]
         public string UserId { get; set; }
-
         [Required]
-        [Range(100000, double.MaxValue, ErrorMessage = "Số tiền gửi tối thiểu là 100,000 VNĐ")]
-        [Display(Name = "Số tiền gửi")]
+        public int MaLoaiSo { get; set; }
+        [Required]
+        public int MaHinhThucDenHan { get; set; }
+        public decimal SoDuSoTietKiem { get; set; }
+        [Required]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Số tiền gửi phải lớn hơn 0")]
         public decimal SoTienGui { get; set; }
-
-        [Required]
-        [Display(Name = "Kỳ hạn")]
-        public int KyHan { get; set; } // Tháng
-
-        [Required]
-        [Display(Name = "Ngày mở sổ")]
+        public decimal LaiSuatKyHan { get; set; }
+        public bool TrangThai { get; set; }
+        public decimal LaiSuatApDung { get; set; }
         public DateTime NgayMoSo { get; set; }
-
-        [Display(Name = "Lãi suất")]
-        public double LaiSuat { get; set; }
-        [Display(Name = "Loại sổ tiết kiệm")]
-        public string LoaiSoTietKiem { get; set; }
-
-        [ForeignKey("UserId")]
-        public ApplicationUser User { get; set; }
+        public DateTime NgayDongSo { get; set; }
     }
 }

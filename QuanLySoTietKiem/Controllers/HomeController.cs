@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using QuanLySoTietKiem.Models;
 
 namespace QuanLySoTietKiem.Controllers
@@ -8,15 +10,32 @@ namespace QuanLySoTietKiem.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public HomeController(ILogger<HomeController> logger, UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
+            _userManager = userManager;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-
+            var currentUser = await _userManager.GetUserAsync(User);
+            if(currentUser == null)
+            {
+                ViewBag.ThongBao = "Bạn chưa đăng nhập vào hệ thống";
+                return View();
+            }
+            ViewBag.UserName = currentUser?.UserName;
+            var checkRole = await _userManager.IsInRoleAsync(currentUser, "User");
+            var checkRoleAdmin = await _userManager.IsInRoleAsync(currentUser, "Admin");
+            if(checkRole)
+            {
+                return RedirectToAction("Index", "User");
+            }else if(checkRoleAdmin)
+            {
+                return RedirectToAction("Index", "Admin");
+            }
             return View();
+
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

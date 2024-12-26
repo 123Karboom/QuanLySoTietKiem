@@ -25,7 +25,7 @@ namespace QuanLySoTietKiem.Controllers
             return View();
         }
         [HttpGet]
-        public async Task<IActionResult> Dashboard()
+        public IActionResult Dashboard()
         {
             return View();
         }
