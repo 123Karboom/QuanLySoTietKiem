@@ -3,7 +3,15 @@
     Layout = "~/Views/Shared/_UserLayout.cshtml";
 
     <div class="container mt-5">
-        <div class="text-center text-green-500 alert alert-success">@ViewBag.ThongBao</div>
+        <div class="text-center text-green-500 alert alert-success">@ViewBag.ThongBao
+            <p class="text-center ">Bây giờ là <span id="current-time">@DateTime.Now</span></p>
+            <script>
+                setInterval(function () {
+                    document.getElementById('current-time').innerText = new Date().toLocaleTimeString();
+                }, 1000);
+            </script>
+
+        </div>
         <div class="row mt-3">
             <div class="col-md-4">
                 <div class="card shadow-sm">
@@ -40,6 +48,54 @@
                     </div>
                 </div>
             </div>
+            <!-- Thêm section biểu đồ -->
+            <div class="container mt-5">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-center">Thống kê tiết kiệm theo tháng</h5>
+                        <canvas id="savingsChart"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('savingsChart');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
+                datasets: [{
+                    label: 'Số dư tiết kiệm',
+                    data: [10000000, 15000000, 20000000, 18000000, 25000000, 30000000, 28000000, 35000000, 40000000, 38000000, 45000000, 50000000],
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (value) {
+                                return value.toLocaleString('vi-VN') + ' VNĐ';
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return context.parsed.y.toLocaleString('vi-VN') + ' VNĐ';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
 }
