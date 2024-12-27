@@ -25,6 +25,7 @@ namespace QuanLySoTietKiem.Controllers
             return View();
         }
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Dashboard()
         {
             return View();

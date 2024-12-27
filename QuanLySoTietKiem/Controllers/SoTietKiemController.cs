@@ -31,27 +31,28 @@ namespace QuanLySoTietKiem.Controllers
         public async Task<IActionResult> Index()
         {
             var currentUser = await _userManager.GetUserAsync(User);
-            var soTietKiems = await _context.SoTietKiems
+            var soTietKiems = await _context.SoTietKiems.Include(s => s.LoaiSoTietKiem).Include(s => s.HinhThucDenHan)
                 .Where(s => s.UserId == currentUser.Id)
                 .ToListAsync();
-            _logger.LogInformation("SoTietKiems: {soTietKiems}", soTietKiems.Count);
+            _logger.LogInformation("Log soTietKiems: {soTietKiems}", soTietKiems.Count);
             var model = soTietKiems.Select(stk => new SoTietKiemModel
-            {
-                MaSoTietKiem = stk.MaSoTietKiem,
-                UserId = stk.UserId,
-                SoTienGui = stk.SoTienGui,
-                NgayMoSo = stk.NgayMoSo,
-                MaHinhThucDenHan = stk.MaHinhThucDenHan,
-                LaiSuatApDung = stk.LaiSuatApDung,
-                NgayDongSo = stk.NgayDongSo ?? DateTime.Now.AddDays(stk.MaLoaiSo * 30),
-                TrangThai = stk.TrangThai,
-                Code = stk.Code,
-                MaLoaiSo = stk.MaLoaiSo,
-                SoDuSoTietKiem = stk.SoDuSoTietKiem,
-            
-            });
-
-            _logger.LogInformation("Model: {model}", model);
+                {
+                    MaSoTietKiem = stk.MaSoTietKiem,
+                    UserId = stk.UserId,
+                    SoTienGui = stk.SoTienGui,
+                    NgayMoSo = stk.NgayMoSo,
+                    MaHinhThucDenHan = stk.MaHinhThucDenHan,
+                    LaiSuatApDung = stk.LaiSuatApDung,
+                    NgayDongSo = stk.NgayDongSo ?? DateTime.Now.AddDays(stk.MaLoaiSo * 30),
+                    TrangThai = stk.TrangThai,
+                    Code = stk.Code,
+                    MaLoaiSo = stk.MaLoaiSo,
+                    SoDuSoTietKiem = stk.SoDuSoTietKiem,
+                    NgayDaoHan = stk.NgayDaoHan,
+                    TenLoaiSo = stk.LoaiSoTietKiem?.TenLoaiSo ?? "",  // Get TenLoaiSo from navigation property
+                    KyHan = stk.LoaiSoTietKiem?.KyHan ?? 0,  // Get KyHan from navigation property
+                    TenHinhThucDenHan = stk.HinhThucDenHan?.TenHinhThucDenHan ?? "" 
+                });
             return View(model);
         }
 
@@ -79,7 +80,7 @@ namespace QuanLySoTietKiem.Controllers
             ViewBag.LoaiSoTietKiemOptions = new SelectList(LoaiSoTietKiemOptions, "MaLoaiSo", "TenLoaiSo");
             return View();
         }
-
+        //Xử lý mở tài khoản tiết kiệm
         [HttpPost]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> OpenSavingsAccount(SoTietKiemModel model)
@@ -89,15 +90,36 @@ namespace QuanLySoTietKiem.Controllers
             {
                 return RedirectToAction("Login", "Account");
             }
-
             // Set required properties before ModelState validation
             model.UserId = currentUser.Id;
             model.NgayMoSo = DateTime.Now;
             model.TrangThai = true;
             model.Code = GenerateCode(currentUser.Id);
-            model.LaiSuatApDung = TinhLaiSuat(model.MaLoaiSo);
+            model.LaiSuatApDung = TinhLaiSuat(model.KyHan);
             model.LaiSuatKyHan = model.LaiSuatApDung;
             model.SoDuSoTietKiem = model.SoTienGui;
+
+            //Fetch KyHan from LoaiSoTietKieMModel table 
+            var loaiSoTietKiem = await _context.LoaiSoTietKiems
+                .FirstOrDefaultAsync(ls => ls.MaLoaiSo == model.MaLoaiSo);
+
+
+            if(loaiSoTietKiem == null)
+            {
+                ModelState.AddModelError("MaLoaiSo", "Loại sổ tiết kiệm không tồn tại");
+                await PopulateViewBagDropdowns();
+                return View(model);
+            }
+
+            model.TenLoaiSo = loaiSoTietKiem.TenLoaiSo;
+            model.KyHan = loaiSoTietKiem.KyHan;
+
+            // Calculate NgayDaoHan 
+            model.NgayDaoHan = model.NgayMoSo.AddMonths(loaiSoTietKiem.KyHan);
+            _logger.LogInformation("NgayDaoHan: {NgayDaoHan}", model.NgayDaoHan);
+            _logger.LogInformation("TenLoaiSo: {TenLoaiSo}", model.TenLoaiSo);
+
+
 
             // Clear ModelState and revalidate with the updated values
             ModelState.Clear();
@@ -123,6 +145,7 @@ namespace QuanLySoTietKiem.Controllers
                     Code = model.Code,
                     SoDuSoTietKiem = model.SoDuSoTietKiem,
                     LaiSuatKyHan = model.LaiSuatKyHan,
+                    NgayDaoHan = model.NgayDaoHan,
                     NgayDongSo = null
                 };
 
@@ -214,8 +237,19 @@ namespace QuanLySoTietKiem.Controllers
                 return RedirectToAction("Login", "Account");
             }
             var soTietKiem = await _context.SoTietKiems.FirstOrDefaultAsync(m => m.MaSoTietKiem == id);
+            // if(!IsAddMoney(DateTime.Now, soTietKiem.NgayDaoHan))
+            //     {
+            //         TempData["Message"] = "Chưa tới ngày đáo hạn để nạp thêm tiền 😊";
+            //         return RedirectToAction("Index"); 
+            //     }
             ViewBag.CodeSTK = await _soTietKiemService.GetCodeSTK(currentUser.Id, id);
             ViewBag.SoDuHienTai = currentUser.SoDuTaiKhoan;
+
+            // nếu ngày hiện tại bằng với ngày đáo hạn thì cho nạp  tiền 
+            
+
+
+
             if (soTietKiem == null)
             {
                 return NotFound();
@@ -228,6 +262,14 @@ namespace QuanLySoTietKiem.Controllers
             };
 
             return View(model);
+        }
+        private bool IsAddMoney(DateTime currentDate, DateTime ngayDaoHan)
+        {
+            if(currentDate == ngayDaoHan)
+            {
+                return true; 
+            }
+            return false; 
         }
         //Xử lý nạp tiền vào sổ tiết kiệm
         [HttpPost]
@@ -308,8 +350,16 @@ namespace QuanLySoTietKiem.Controllers
             {
                 return RedirectToAction("Login", "Account");
             }
+            
+            ViewBag.SoDuHienTai = currentUser.SoDuTaiKhoan;
+            // Hiển thị số dư sổ tiết kiệm
+            var getSoDuSoTietKiem = await _context.SoTietKiems.Where(s => s.UserId == currentUser.Id).Select(s => s.SoDuSoTietKiem).FirstOrDefaultAsync();
+            ViewBag.SoDuSoTietKiem = getSoDuSoTietKiem;
+            //Hiển thị lãi bao nhiêu
+            
             return View();
         }
-      
+
+        
     }
 }

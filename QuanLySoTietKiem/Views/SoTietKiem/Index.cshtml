@@ -1,10 +1,18 @@
 ﻿@model IEnumerable<QuanLySoTietKiem.Models.SoTietKiemModel>
 @{
-    ViewData["Title"] = "Danh sách sổ tiết kiệm";
+    ViewData["Title"] = "Quản lý sổ tiết kiệm";
     Layout = "~/Views/Shared/_UserLayout.cshtml";
 }
 
 <div class="container mt-5">
+    @* Thông báo chỗ này khi người dùng chưa được rút tiền *@
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-info">
+            @TempData["Message"]
+        </div>
+    }
+
     <div class="card shadow">
         <div class="card-header bg-success text-white">
             <div class="d-flex justify-content-between align-items-center">
@@ -19,6 +27,7 @@
         </div>
         <div class="card-body">
             @if (!Model.Any())
+
             {
                 <div class="text-center py-5">
                     <i class="bi bi-inbox display-1 text-muted"></i>
@@ -40,7 +49,8 @@
                                 <th>Lãi Suất</th>
                                 <th>Ngày Mở Sổ</th>
                                 <th>Ngày Đáo Hạn</th>
-                                <th>Hành Độngs</th>
+                                <th>Hình thức đến hạn</th>
+                                <th>Hành Động</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -49,11 +59,12 @@
                                 <tr>
                                     <td>@item.MaSoTietKiem</td>
                                     <td>@item.SoDuSoTietKiem.ToString("N0") VNĐ</td>
-                                    <td>@item.MaHinhThucDenHan tháng</td>
+                                    <td>@(item.KyHan > 0 ? $"{item.KyHan} tháng" : "N/A")</td>
                                     <td>@(item.LaiSuatApDung * 100)%</td>
                                     <td>@item.NgayMoSo.ToString("dd/MM/yyyy")</td>
-                                    <td>@item.NgayMoSo.AddMonths(item.MaHinhThucDenHan).ToString("dd/MM/yyyy")</td>
-                                    <td>    
+                                    <td>@item.NgayDaoHan.ToString("dd/MM/yyyy")</td>
+                                    <td>@item.TenHinhThucDenHan</td>
+                                    <td>
                                         <a asp-action="Details" asp-route-id="@item.MaSoTietKiem" class="btn btn-sm btn-info">
                                             <i class="bi bi-eye"></i>
                                             Xem chi tiết

@@ -21,7 +21,7 @@ namespace QuanLySoTietKiem.Controllers
             var currentUser = await _userManager.GetUserAsync(User);
             if(currentUser == null)
             {
-                ViewBag.ThongBao = "Bạn chưa đăng nhập vào hệ thống";
+                ViewBag.ThongBao = "Bạn chưa đăng nhập vào hệ thống, vui lòng đăng nhập để sử dụng 😊";
                 return View();
             }
             ViewBag.UserName = currentUser?.UserName;

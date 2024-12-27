@@ -23,5 +23,10 @@ namespace QuanLySoTietKiem.Services
           .Select(s => s.Code)
           .FirstOrDefaultAsync() ?? string.Empty;
         }
+        public async Task<double> GetSoDuSoTietKiemByCodeSTK(string userId, string CodeSTK){
+          
+          var soDuSoTietKiem = await _context.SoTietKiems.Where(s => s.UserId == userId && s.Code == CodeSTK).Select(s => s.SoDuSoTietKiem).FirstOrDefaultAsync();
+          return (double)soDuSoTietKiem;
+        }
     }
 }
