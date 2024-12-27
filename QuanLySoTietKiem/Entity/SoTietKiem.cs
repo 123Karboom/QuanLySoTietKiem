@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using QuanLySoTietKiem.Entity;
 
 namespace QuanLySoTietKiem.Models
 {
@@ -34,9 +35,8 @@ namespace QuanLySoTietKiem.Models
         public virtual LoaiSoTietKiem? LoaiSoTietKiem { get; set; }
         [ForeignKey("UserId")]
         public virtual ApplicationUser? User { get; set; }
-        public virtual ICollection<PhieuRutTien>? PhieuRutTiens { get; set; }
-        public virtual ICollection<PhieuGuiTien>? PhieuGuiTiens { get; set; }
         [ForeignKey("MaHinhThucDenHan")]
         public virtual HinhThucDenHan? HinhThucDenHan { get; set; }
+        public virtual ICollection<GiaoDich>? GiaoDichs { get;set; }
     }
 }

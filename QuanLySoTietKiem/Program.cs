@@ -24,6 +24,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 //add services
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ISoTietKiemService, SoTietKiemService>();
+builder.Services.AddScoped<IGiaoDichService, GiaoDichService>();
 builder.Services.AddScoped<UserManager<ApplicationUser>>(); 
 
 //Config Logging 

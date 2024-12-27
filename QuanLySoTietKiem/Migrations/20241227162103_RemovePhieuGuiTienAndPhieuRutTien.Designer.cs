@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QuanLySoTietKiem.Data;
 
@@ -11,9 +12,11 @@ using QuanLySoTietKiem.Data;
 namespace QuanLySoTietKiem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241227162103_RemovePhieuGuiTienAndPhieuRutTien")]
+    partial class RemovePhieuGuiTienAndPhieuRutTien
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -201,18 +204,6 @@ namespace QuanLySoTietKiem.Migrations
                     b.HasKey("MaLoaiGiaoDich");
 
                     b.ToTable("LoaiGiaoDichs");
-
-                    b.HasData(
-                        new
-                        {
-                            MaLoaiGiaoDich = 1,
-                            TenLoaiGiaoDich = "Rút tiền"
-                        },
-                        new
-                        {
-                            MaLoaiGiaoDich = 2,
-                            TenLoaiGiaoDich = "Gửi tiền"
-                        });
                 });
 
             modelBuilder.Entity("QuanLySoTietKiem.Models.ApplicationUser", b =>
@@ -440,6 +431,54 @@ namespace QuanLySoTietKiem.Migrations
                     b.ToTable("LoaiSoTietKiems");
                 });
 
+            modelBuilder.Entity("QuanLySoTietKiem.Models.PhieuGuiTien", b =>
+                {
+                    b.Property<int>("MaPhieuGui")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaPhieuGui"));
+
+                    b.Property<int>("MaSoTietKiem")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("NgayGui")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("SoTienGui")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("MaPhieuGui");
+
+                    b.HasIndex("MaSoTietKiem");
+
+                    b.ToTable("PhieuGuiTien");
+                });
+
+            modelBuilder.Entity("QuanLySoTietKiem.Models.PhieuRutTien", b =>
+                {
+                    b.Property<int>("MaPhieuRut")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaPhieuRut"));
+
+                    b.Property<int>("MaSoTietKiem")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("NgayRut")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("SoTienRut")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("MaPhieuRut");
+
+                    b.HasIndex("MaSoTietKiem");
+
+                    b.ToTable("PhieuRutTien");
+                });
+
             modelBuilder.Entity("QuanLySoTietKiem.Models.SoTietKiem", b =>
                 {
                     b.Property<int>("MaSoTietKiem")
@@ -593,6 +632,28 @@ namespace QuanLySoTietKiem.Migrations
                     b.Navigation("LoaiSoTietKiem");
                 });
 
+            modelBuilder.Entity("QuanLySoTietKiem.Models.PhieuGuiTien", b =>
+                {
+                    b.HasOne("QuanLySoTietKiem.Models.SoTietKiem", "SoTietKiem")
+                        .WithMany("PhieuGuiTiens")
+                        .HasForeignKey("MaSoTietKiem")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SoTietKiem");
+                });
+
+            modelBuilder.Entity("QuanLySoTietKiem.Models.PhieuRutTien", b =>
+                {
+                    b.HasOne("QuanLySoTietKiem.Models.SoTietKiem", "SoTietKiem")
+                        .WithMany("PhieuRutTiens")
+                        .HasForeignKey("MaSoTietKiem")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SoTietKiem");
+                });
+
             modelBuilder.Entity("QuanLySoTietKiem.Models.SoTietKiem", b =>
                 {
                     b.HasOne("QuanLySoTietKiem.Models.HinhThucDenHan", "HinhThucDenHan")
@@ -642,6 +703,10 @@ namespace QuanLySoTietKiem.Migrations
             modelBuilder.Entity("QuanLySoTietKiem.Models.SoTietKiem", b =>
                 {
                     b.Navigation("GiaoDichs");
+
+                    b.Navigation("PhieuGuiTiens");
+
+                    b.Navigation("PhieuRutTiens");
                 });
 #pragma warning restore 612, 618
         }

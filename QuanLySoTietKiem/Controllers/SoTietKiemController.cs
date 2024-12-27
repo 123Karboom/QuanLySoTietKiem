@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QuanLySoTietKiem.Data;
+using QuanLySoTietKiem.Entity;
 using QuanLySoTietKiem.Models;
 using QuanLySoTietKiem.Models.SavingsAccount;
 using QuanLySoTietKiem.Services.Interfaces;
@@ -311,15 +312,19 @@ namespace QuanLySoTietKiem.Controllers
                 currentUser.SoDuTaiKhoan -= (double)model.SoTienGui;
                 await _userManager.UpdateAsync(currentUser);
 
-                // //Tạo phiếu gửi tiền
-                // var phieuGuiTien = new QuanLySoTietKiem.Models.PhieuGuiTienModel
-                // {
-                //     MaSoTietKiem = model.MaSoTietKiem,
-                //     SoTienGui = model.SoTienGui,
-                //     NgayGui = DateTime.Now,
-                // };
+                //Tạo giao dịch mới 
+                var giaoDich = new GiaoDich 
+                {
+                    MaSoTietKiem = model.MaSoTietKiem, 
+                    MaLoaiGiaoDich = 2, 
+                    NgayGiaoDich = DateTime.Now, 
+                    SoTien = (double)model.SoTienGui, 
+
+                };
+
 
                 // await _context.PhieuGuiTiens.AddAsync(phieuGuiTien);
+                await _context.GiaoDichs.AddAsync(giaoDich);
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
@@ -356,10 +361,8 @@ namespace QuanLySoTietKiem.Controllers
             var getSoDuSoTietKiem = await _context.SoTietKiems.Where(s => s.UserId == currentUser.Id).Select(s => s.SoDuSoTietKiem).FirstOrDefaultAsync();
             ViewBag.SoDuSoTietKiem = getSoDuSoTietKiem;
             //Hiển thị lãi bao nhiêu
-            
             return View();
         }
 
-        
     }
 }
