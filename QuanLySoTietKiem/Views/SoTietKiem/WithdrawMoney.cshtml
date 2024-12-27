@@ -1,1 +1,10 @@
-<h1>WithdrawMoney</h1>
+@{
+  ViewData["Title"] = "Rút tiền";
+  Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+<h1 class="text-center">Rút tiền 😄</h1>
+@* Alter thông báo số tiền  *@
+<div class="alert alert-success" role="alert">
+  <h4 class="alert-heading">Số tiền rút tối đa là @ViewBag.SoDuSoTietKiem</h4>
+  <p>Số tiền rút tối đa là @ViewBag.SoDuSoTietKiem</p>
+</div>

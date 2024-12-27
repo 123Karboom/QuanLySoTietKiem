@@ -27,6 +27,8 @@ namespace QuanLySoTietKiem.Models
         public DateTime NgayMoSo { get; set; } // Ngày mở sổ
         public DateTime? NgayDongSo { get; set; } // Ngày đóng sổ
         [Required]
+        public DateTime NgayDaoHan {get;set;} // Ngày đáo hạn
+        [Required]
         public string UserId { get; set; }
         [ForeignKey("MaLoaiSo")]
         public virtual LoaiSoTietKiem? LoaiSoTietKiem { get; set; }
