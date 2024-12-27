@@ -15,16 +15,16 @@
           </div>
         </div>
         <div class="card-body">
-          <div class="alert alert-info">
+          <div class="alert alert-success">
             <i class="bi bi-info-circle-fill me-2"></i>
-              Số dư hiện tại: <strong>@ViewBag.SoDuHienTai.ToString("N0") VNĐ</strong>
+            Số dư hiện tại: <strong>@ViewBag.SoDuHienTai.ToString("N0") VNĐ</strong>
           </div>
 
           <form asp-action="OpenSavingsAccount" method="post">
             @Html.AntiForgeryToken()
 
             <div class="mb-3">
-              <label asp-for="SoTienGui" class="form-label fw-bold text-primary">
+              <label asp-for="SoTienGui" class="form-label fw-bold text-success">
                 <i class="bi bi-cash-stack me-2"></i> Số tiền gửi
               </label>
               <input asp-for="SoTienGui" class="form-control" type="number" min="1000000"
@@ -33,14 +33,14 @@
             </div>
             @* Code STK tự động tạo trong hệ thống *@
             <div class="mb-3">
-              <label asp-for="Code" class="form-label fw-bold text-primary">
+              <label asp-for="Code" class="form-label fw-bold text-success">
                 <i class="bi bi-code-slash me-2"></i>Mã Sổ tiết kiệm (Tự động tạo trong hệ thống)
               </label>
               <input asp-for="Code" class="form-control" type="text" value="@ViewBag.CodeSTK" readonly />
             </div>
 
             @* <div class="mb-3">
-              <label asp-for="MaHinhThucDenHan" class="form-label fw-bold text-primary">
+              <label asp-for="MaHinhThucDenHan" class="form-label fw-bold text-success">
                 <i class="bi bi-calendar-event me-2"></i>Kỳ hạn
               </label>
               <select asp-for="MaHinhThucDenHan" class="form-select">
@@ -53,7 +53,7 @@
             </div> *@
 
             <div class="mb-3">
-              <label asp-for="MaHinhThucDenHan" class="form-label fw-bold text-primary">
+              <label asp-for="MaHinhThucDenHan" class="form-label fw-bold text-success">
                 <i class="bi bi-calendar-event me-2"></i>Hình thức đến hạn
               </label>
               <select asp-for="MaHinhThucDenHan" class="form-select" asp-items="ViewBag.HinhThucDenHanOptions"></select>
@@ -61,8 +61,8 @@
             </div>
 
             <div class="mb-3">
-              <label asp-for="MaLoaiSo" class="form-label fw-bold text-primary">
-                <i class="bi bi-cash-stack me-2"></i>Kỳ hạn
+              <label asp-for="MaLoaiSo" class="form-label fw-bold text-success">
+                <i class="bi bi-cash-stack me-2"></i>Loại sổ tiết kiệm
               </label>
               <select asp-for="MaLoaiSo" class="form-select" asp-items="ViewBag.LoaiSoTietKiemOptions"></select>
               <span asp-validation-for="MaLoaiSo" class="text-danger"></span>

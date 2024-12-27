@@ -8,7 +8,7 @@
     @* Thông báo chỗ này khi người dùng chưa được rút tiền *@
     @if (TempData["Message"] != null)
     {
-        <div class="alert alert-info">
+        <div class="alert alert-success">
             @TempData["Message"]
         </div>
     }
@@ -46,11 +46,13 @@
                                 <th>Số Sổ</th>
                                 <th>Số Tiền Gửi</th>
                                 <th>Kỳ Hạn</th>
+                                <th>Code STK</th>
                                 <th>Lãi Suất</th>
                                 <th>Ngày Mở Sổ</th>
                                 <th>Ngày Đáo Hạn</th>
                                 <th>Hình thức đến hạn</th>
                                 <th>Hành Động</th>
+
                             </tr>
                         </thead>
                         <tbody>
@@ -60,6 +62,7 @@
                                     <td>@item.MaSoTietKiem</td>
                                     <td>@item.SoDuSoTietKiem.ToString("N0") VNĐ</td>
                                     <td>@(item.KyHan > 0 ? $"{item.KyHan} tháng" : "N/A")</td>
+                                    <td>@item.Code</td>
                                     <td>@(item.LaiSuatApDung * 100)%</td>
                                     <td>@item.NgayMoSo.ToString("dd/MM/yyyy")</td>
                                     <td>@item.NgayDaoHan.ToString("dd/MM/yyyy")</td>
