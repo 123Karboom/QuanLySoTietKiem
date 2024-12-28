@@ -44,7 +44,7 @@ namespace QuanLySoTietKiem.Controllers
             // Hiển thị tổng số sổ tiết kiệm của người dùng
             var count = await _soTietKiemService.CountSoTietKiem(currentUser.Id);
             ViewBag.UserName = currentUser.FullName;
-            ViewBag.ThongBao = "Chào mừng " + currentUser.FullName + " đã quay trở lại hệ thống 😊";
+            ViewBag.ThongBao = "Hello " + currentUser.FullName + " đã quay trở lại hệ thống 😊";
             ViewBag.CountSoTietKiem = count;
             return View();
         }
