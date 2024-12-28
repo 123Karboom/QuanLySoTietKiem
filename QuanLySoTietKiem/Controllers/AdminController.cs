@@ -65,6 +65,5 @@ namespace QuanLySoTietKiem.Controllers
             }
             return View(user);
         }
-
     }
 }

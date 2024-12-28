@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Models.RutTien;
 using QuanLySoTietKiem.Data;
 using QuanLySoTietKiem.Entity;
 using QuanLySoTietKiem.Models;
@@ -37,23 +39,23 @@ namespace QuanLySoTietKiem.Controllers
                 .ToListAsync();
             _logger.LogInformation("Log soTietKiems: {soTietKiems}", soTietKiems.Count);
             var model = soTietKiems.Select(stk => new SoTietKiemModel
-                {
-                    MaSoTietKiem = stk.MaSoTietKiem,
-                    UserId = stk.UserId,
-                    SoTienGui = stk.SoTienGui,
-                    NgayMoSo = stk.NgayMoSo,
-                    MaHinhThucDenHan = stk.MaHinhThucDenHan,
-                    LaiSuatApDung = stk.LaiSuatApDung,
-                    NgayDongSo = stk.NgayDongSo ?? DateTime.Now.AddDays(stk.MaLoaiSo * 30),
-                    TrangThai = stk.TrangThai,
-                    Code = stk.Code,
-                    MaLoaiSo = stk.MaLoaiSo,
-                    SoDuSoTietKiem = stk.SoDuSoTietKiem,
-                    NgayDaoHan = stk.NgayDaoHan,
-                    TenLoaiSo = stk.LoaiSoTietKiem?.TenLoaiSo ?? "",  // Get TenLoaiSo from navigation property
-                    KyHan = stk.LoaiSoTietKiem?.KyHan ?? 0,  // Get KyHan from navigation property
-                    TenHinhThucDenHan = stk.HinhThucDenHan?.TenHinhThucDenHan ?? "" 
-                });
+            {
+                MaSoTietKiem = stk.MaSoTietKiem,
+                UserId = stk.UserId,
+                SoTienGui = stk.SoTienGui,
+                NgayMoSo = stk.NgayMoSo,
+                MaHinhThucDenHan = stk.MaHinhThucDenHan,
+                LaiSuatApDung = stk.LaiSuatApDung,
+                NgayDongSo = stk.NgayDongSo ?? DateTime.Now.AddDays(stk.MaLoaiSo * 30),
+                TrangThai = stk.TrangThai,
+                Code = stk.Code,
+                MaLoaiSo = stk.MaLoaiSo,
+                SoDuSoTietKiem = stk.SoDuSoTietKiem,
+                NgayDaoHan = stk.NgayDaoHan,
+                TenLoaiSo = stk.LoaiSoTietKiem?.TenLoaiSo ?? "",  // Get TenLoaiSo from navigation property
+                KyHan = stk.LoaiSoTietKiem?.KyHan ?? 0,  // Get KyHan from navigation property
+                TenHinhThucDenHan = stk.HinhThucDenHan?.TenHinhThucDenHan ?? ""
+            });
             return View(model);
         }
 
@@ -96,24 +98,24 @@ namespace QuanLySoTietKiem.Controllers
             model.NgayMoSo = DateTime.Now;
             model.TrangThai = true;
             model.Code = GenerateCode(currentUser.Id);
-            model.LaiSuatApDung = TinhLaiSuat(model.KyHan);
-            model.LaiSuatKyHan = model.LaiSuatApDung;
             model.SoDuSoTietKiem = model.SoTienGui;
 
             //Fetch KyHan from LoaiSoTietKieMModel table 
             var loaiSoTietKiem = await _context.LoaiSoTietKiems
-                .FirstOrDefaultAsync(ls => ls.MaLoaiSo == model.MaLoaiSo);
+            .FirstOrDefaultAsync(ls => ls.MaLoaiSo == model.MaLoaiSo);
 
-
-            if(loaiSoTietKiem == null)
+            if (loaiSoTietKiem == null)
             {
                 ModelState.AddModelError("MaLoaiSo", "Loại sổ tiết kiệm không tồn tại");
                 await PopulateViewBagDropdowns();
                 return View(model);
             }
-
-            model.TenLoaiSo = loaiSoTietKiem.TenLoaiSo;
             model.KyHan = loaiSoTietKiem.KyHan;
+            model.LaiSuatKyHan = ((decimal)loaiSoTietKiem.LaiSuat) / 100; //chia cho 100
+            model.LaiSuatApDung = ((decimal)loaiSoTietKiem.LaiSuat) / 100;
+
+            _logger.LogInformation("LaiSuatKyHan: {LaiSuatKyHan}", model.LaiSuatKyHan);
+            _logger.LogInformation("LaiSuatApDung: {LaiSuatApDung}", model.LaiSuatApDung);
 
             // Calculate NgayDaoHan 
             model.NgayDaoHan = model.NgayMoSo.AddMonths(loaiSoTietKiem.KyHan);
@@ -142,10 +144,10 @@ namespace QuanLySoTietKiem.Controllers
                     MaHinhThucDenHan = model.MaHinhThucDenHan,
                     MaLoaiSo = model.MaLoaiSo,
                     LaiSuatApDung = model.LaiSuatApDung,
+                    LaiSuatKyHan = model.LaiSuatKyHan,
                     TrangThai = model.TrangThai,
                     Code = model.Code,
                     SoDuSoTietKiem = model.SoDuSoTietKiem,
-                    LaiSuatKyHan = model.LaiSuatKyHan,
                     NgayDaoHan = model.NgayDaoHan,
                     NgayDongSo = null
                 };
@@ -170,17 +172,17 @@ namespace QuanLySoTietKiem.Controllers
             return View(model);
         }
 
-        private decimal TinhLaiSuat(int kyHan)
-        {
-            // Định nghĩa lãi suất theo kỳ hạn
-            return kyHan switch
-            {
+        // private decimal TinhLaiSuat(int kyHan)
+        // {
+        //     // Định nghĩa lãi suất theo kỳ hạn
+        //     return kyHan switch
+        //     {
 
-                3 => 0.05m, // 3% cho 3 tháng
-                6 => 0.055m, // 4% cho 6 tháng
-                _ => 0.005m, // 1% cho các trường hợp khác
-            };
-        }
+        //         3 => 0.05m, // 3% cho 3 tháng
+        //         6 => 0.055m, // 4% cho 6 tháng
+        //         _ => 0.005m, // 1% cho các trường hợp khác
+        //     };
+        // }
         private string GenerateCode(string userId)
         {
             return "STK" + "-" + userId + "-" + DateTime.Now.ToString("yyyyMMddHHmmss");
@@ -204,11 +206,42 @@ namespace QuanLySoTietKiem.Controllers
             {
                 return RedirectToAction("Login", "Account");
             }
-            var soTietKiem = await _context.SoTietKiems.FirstOrDefaultAsync(s => s.MaSoTietKiem == id && s.UserId == currentUser.Id);
+
+            var soTietKiem = await _context.SoTietKiems
+                .Include(s => s.LoaiSoTietKiem)
+                .Include(s => s.HinhThucDenHan)
+                .Include(s => s.User)
+                .FirstOrDefaultAsync(s => s.MaSoTietKiem == id && s.UserId == currentUser.Id); // Ensure you check for UserId
+
             if (soTietKiem == null)
             {
-                return NotFound();
+                return NotFound(); // This will return a 404 if the code does not exist
             }
+            // Tính lãi suất áp dụng
+            decimal laiSuatApDung = LaiSuatHelper.TinhLaiSuatRutTien(
+                soTietKiem.NgayMoSo,
+                soTietKiem.NgayDaoHan,
+                DateTime.Now,
+                soTietKiem.LaiSuatKyHan
+            );
+            _logger.LogInformation("Laisuatkyhan: {Laisuatkyhan}", soTietKiem.LaiSuatKyHan);
+            var soNgayGui = (DateTime.Now - soTietKiem.NgayMoSo).Days;
+            // Tính tiền lãi
+            decimal tienLai = LaiSuatHelper.TinhTienLai(
+                soTietKiem.SoDuSoTietKiem,
+                laiSuatApDung,
+                soNgayGui
+            );
+            _logger.LogInformation("SoDuSoTietkiem: {SoDuSoTietkiem}", soTietKiem.SoDuSoTietKiem);
+            _logger.LogInformation("LaiSuatApDung: {LaiSuatApDung}", laiSuatApDung);
+            _logger.LogInformation("NgayDongSo: {NgayDongSo}", soTietKiem.NgayDongSo);
+            _logger.LogInformation("soNgayGui: {soNgayGui}", soNgayGui);
+            _logger.LogInformation("TienLai: {TienLai}", tienLai);
+            ViewBag.LaiSuatApDung = laiSuatApDung;
+            ViewBag.TienLai = tienLai;
+            ViewBag.TongTienNhanDuoc = soTietKiem.SoDuSoTietKiem + tienLai;
+
+
             var model = new SoTietKiemDetailModel
             {
                 MaSoTietKiem = soTietKiem.MaSoTietKiem,
@@ -219,12 +252,17 @@ namespace QuanLySoTietKiem.Controllers
                 LaiSuatKyHan = soTietKiem.LaiSuatKyHan,
                 NgayMoSo = soTietKiem.NgayMoSo,
                 NgayDongSo = soTietKiem.NgayDongSo,
+                NgayDaoHan = soTietKiem.NgayDaoHan,
                 TrangThai = soTietKiem.TrangThai,
                 TenLoaiSo = soTietKiem.LoaiSoTietKiem?.TenLoaiSo ?? "",
                 KyHan = soTietKiem.LoaiSoTietKiem?.KyHan ?? 0,
                 TenHinhThucDenHan = soTietKiem.HinhThucDenHan?.TenHinhThucDenHan ?? "",
+                SoTienThucHuong = soTietKiem.SoDuSoTietKiem + tienLai,
                 TenKhachHang = soTietKiem.User?.FullName ?? "unknown"
             };
+
+            //
+
             return View(model);
         }
         //Load trang nạp tiền vào sổ tiết kiệm
@@ -238,16 +276,15 @@ namespace QuanLySoTietKiem.Controllers
                 return RedirectToAction("Login", "Account");
             }
             var soTietKiem = await _context.SoTietKiems.FirstOrDefaultAsync(m => m.MaSoTietKiem == id);
-            // if(!IsAddMoney(DateTime.Now, soTietKiem.NgayDaoHan))
-            //     {
-            //         TempData["Message"] = "Chưa tới ngày đáo hạn để nạp thêm tiền 😊";
-            //         return RedirectToAction("Index"); 
-            //     }
+            if (!IsAddMoney(DateTime.Now, soTietKiem.NgayDaoHan))
+            {
+                TempData["Message"] = "Chưa tới ngày đáo hạn để nạp thêm tiền 😊";
+                return RedirectToAction("Index");
+            }
             ViewBag.CodeSTK = await _soTietKiemService.GetCodeSTK(currentUser.Id, id);
             ViewBag.SoDuHienTai = currentUser.SoDuTaiKhoan;
 
-            // nếu ngày hiện tại bằng với ngày đáo hạn thì cho nạp  tiền 
-            
+
 
 
 
@@ -266,11 +303,11 @@ namespace QuanLySoTietKiem.Controllers
         }
         private bool IsAddMoney(DateTime currentDate, DateTime ngayDaoHan)
         {
-            if(currentDate == ngayDaoHan)
+            if (currentDate == ngayDaoHan)
             {
-                return true; 
+                return true;
             }
-            return false; 
+            return false;
         }
         //Xử lý nạp tiền vào sổ tiết kiệm
         [HttpPost]
@@ -313,12 +350,12 @@ namespace QuanLySoTietKiem.Controllers
                 await _userManager.UpdateAsync(currentUser);
 
                 //Tạo giao dịch mới 
-                var giaoDich = new GiaoDich 
+                var giaoDich = new GiaoDich
                 {
-                    MaSoTietKiem = model.MaSoTietKiem, 
-                    MaLoaiGiaoDich = 2, 
-                    NgayGiaoDich = DateTime.Now, 
-                    SoTien = (double)model.SoTienGui, 
+                    MaSoTietKiem = model.MaSoTietKiem,
+                    MaLoaiGiaoDich = 2,
+                    NgayGiaoDich = DateTime.Now,
+                    SoTien = (double)model.SoTienGui,
 
                 };
 
@@ -348,20 +385,51 @@ namespace QuanLySoTietKiem.Controllers
         //Xử lý rút tiền 
         [HttpGet]
         [Authorize(Roles = "User")]
-        public async Task<IActionResult> WithdrawMoney()
+        public async Task<IActionResult> WithdrawMoney(int id)
         {
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
             {
                 return RedirectToAction("Login", "Account");
             }
-            
-            ViewBag.SoDuHienTai = currentUser.SoDuTaiKhoan;
-            // Hiển thị số dư sổ tiết kiệm
-            var getSoDuSoTietKiem = await _context.SoTietKiems.Where(s => s.UserId == currentUser.Id).Select(s => s.SoDuSoTietKiem).FirstOrDefaultAsync();
-            ViewBag.SoDuSoTietKiem = getSoDuSoTietKiem;
-            //Hiển thị lãi bao nhiêu
-            return View();
+
+            var soTietKiem = await _context.SoTietKiems
+        .Include(s => s.LoaiSoTietKiem)
+        .FirstOrDefaultAsync(s => s.MaSoTietKiem == id);
+
+            if (soTietKiem == null)
+                return NotFound();
+
+            var model = new WithdrawMoneyViewModel
+            {
+                MaSoTietKiem = soTietKiem.MaSoTietKiem,
+                SoDuHienTai = soTietKiem.SoDuSoTietKiem,
+                NgayMoSo = soTietKiem.NgayMoSo,
+                NgayDaoHan = soTietKiem.NgayDaoHan,
+                LaiSuatKyHan = soTietKiem.LaiSuatKyHan,
+                Code = soTietKiem.Code
+            };
+
+            // Tính lãi suất áp dụng
+            decimal laiSuatApDung = LaiSuatHelper.TinhLaiSuatRutTien(
+                soTietKiem.NgayMoSo,
+                soTietKiem.NgayDaoHan,
+                DateTime.Now,
+                soTietKiem.LaiSuatKyHan
+            );
+
+            // Tính tiền lãi
+            decimal tienLai = LaiSuatHelper.TinhTienLai(
+                soTietKiem.SoDuSoTietKiem,
+                laiSuatApDung,
+                (DateTime.Now - soTietKiem.NgayMoSo).Days
+            );
+
+            ViewBag.LaiSuatApDung = laiSuatApDung;
+            ViewBag.TienLai = tienLai;
+            ViewBag.TongTienNhanDuoc = soTietKiem.SoDuSoTietKiem + tienLai;
+
+            return View(model);
         }
 
     }

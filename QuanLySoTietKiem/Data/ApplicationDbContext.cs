@@ -15,8 +15,8 @@ namespace QuanLySoTietKiem.Data
         public DbSet<BaoCaoNgay> BaoCaoNgays { get; set; }
         public DbSet<BaoCaoThang> BaoCaoThangs { get; set; }
         public DbSet<HinhThucDenHan> HinhThucDenHans { get; set; }
-        public DbSet<LoaiGiaoDich> LoaiGiaoDichs {get;set;}
-        public DbSet<GiaoDich> GiaoDichs {get;set;}
+        public DbSet<LoaiGiaoDich> LoaiGiaoDichs { get; set; }
+        public DbSet<GiaoDich> GiaoDichs { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -30,10 +30,10 @@ namespace QuanLySoTietKiem.Data
             modelBuilder.Entity<LoaiSoTietKiem>().Property(l => l.SoTienGuiToiThieu).HasPrecision(18, 2);
             modelBuilder.Entity<SoTietKiem>().Property(s => s.SoDuSoTietKiem).HasPrecision(18, 2);
             modelBuilder.Entity<SoTietKiem>().Property(s => s.SoTienGui).HasPrecision(18, 2);
-            modelBuilder.Entity<SoTietKiem>().Property(s => s.LaiSuatKyHan).HasPrecision(18, 2);
+            modelBuilder.Entity<SoTietKiem>().Property(s => s.LaiSuatKyHan).HasPrecision(18, 3);
             modelBuilder.Entity<BaoCaoThang>().Property(b => b.TongSoTienGui).HasPrecision(18, 2);
             modelBuilder.Entity<BaoCaoThang>().Property(b => b.TongSoTienRut).HasPrecision(18, 2);
-            modelBuilder.Entity<SoTietKiem>().Property(s => s.LaiSuatApDung).HasPrecision(18, 2);
+            modelBuilder.Entity<SoTietKiem>().Property(s => s.LaiSuatApDung).HasPrecision(18, 3);
             modelBuilder.Entity<GiaoDich>().Property(g => g.SoTien).HasPrecision(18, 2);
 
             //  Seed data for HinhThucDenHan
@@ -43,17 +43,19 @@ namespace QuanLySoTietKiem.Data
                 new HinhThucDenHan() { MaHinhThucDenHan = 3, TenHinhThucDenHan = "Quay vòng cả gốc và lãi" }
             );
             //Seed data for LoaiGiaoDich
-            modelBuilder.Entity<LoaiGiaoDich>().HasData(new LoaiGiaoDich() {
-                MaLoaiGiaoDich = 1, 
+            modelBuilder.Entity<LoaiGiaoDich>().HasData(new LoaiGiaoDich()
+            {
+                MaLoaiGiaoDich = 1,
                 TenLoaiGiaoDich = "Rút tiền"
-            }, new LoaiGiaoDich() {
-                MaLoaiGiaoDich = 2, 
+            }, new LoaiGiaoDich()
+            {
+                MaLoaiGiaoDich = 2,
                 TenLoaiGiaoDich = "Gửi tiền"
             });
 
-            
 
-            
+
+
 
 
         }

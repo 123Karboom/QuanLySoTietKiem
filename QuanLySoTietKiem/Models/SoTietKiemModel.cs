@@ -23,12 +23,14 @@ namespace QuanLySoTietKiem.Models
         public decimal LaiSuatApDung { get; set; } // Lãi suất áp dụng 
         public DateTime NgayMoSo { get; set; } // Ngày mở sổ 
         public DateTime NgayDongSo { get; set; } // Ngày đóng sổ 
-        public DateTime NgayDaoHan {get; set;} // Ngày đáo hạn 
-        public string? TenLoaiSo {get; set;}
-        public int KyHan {get; set;}
+        public DateTime NgayDaoHan { get; set; } // Ngày đáo hạn 
+        public string? TenLoaiSo { get; set; }
+        public int KyHan { get; set; }
 
-        public string? TenHinhThucDenHan {get;set;}
+        public string? TenHinhThucDenHan { get; set; }
 
-        
+
+
+
     }
 }

@@ -1,10 +1,65 @@
+@model Models.RutTien.WithdrawMoneyViewModel
 @{
   ViewData["Title"] = "Rút tiền";
   Layout = "~/Views/Shared/_UserLayout.cshtml";
 }
-<h1 class="text-center">Rút tiền 😄</h1>
-@* Alter thông báo số tiền  *@
-<div class="alert alert-success" role="alert">
-  <h4 class="alert-heading">Số tiền rút tối đa là @ViewBag.SoDuSoTietKiem</h4>
-  <p>Số tiền rút tối đa là @ViewBag.SoDuSoTietKiem</p>
+
+<div class="container mt-5">
+  <div class="card shadow">
+    <div class="card-header bg-success text-white">
+      <div class="d-flex align-items-center">
+        <i class="bi bi-cash-stack me-2"></i>
+        <h3 class="mb-0">Rút Tiền - Sổ @Model.Code</h3>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="alert alert-info">
+        <h5>Thông tin rút tiền:</h5>
+        <ul class="list-unstyled">
+          <li><strong>Số dư hiện tại:</strong> @Model.SoDuHienTai.ToString("N0") VNĐ</li>
+          @* <li><strong>Ngày mở sổ:</strong> @Model.NgayMoSo.ToString("dd/MM/yyyy")</li> *@
+          @* <li><strong>Ngày đáo hạn:</strong> @Model.NgayDaoHan.ToString("dd/MM/yyyy")</li> *@
+          <li><strong>Lãi suất:</strong> @Model.LaiSuatKyHan.ToString("P1")</li>
+          @* <li><strong>Lãi suất áp dụng:</strong> @ViewBag.LaiSuatApDung%/năm</li> *@
+          <li><strong>Tiền lãi:</strong> @ViewBag.TienLai.ToString("N0") VNĐ</li>
+          <li><strong>Tổng tiền nhận được (gốc + lãi):</strong> @ViewBag.TongTienNhanDuoc.ToString("N0") VNĐ</li>
+        </ul>
+
+        @if (DateTime.Now < Model.NgayDaoHan)
+        {
+          <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <strong>Lưu ý:</strong> Rút tiền trước hạn sẽ được áp dụng lãi suất thấp hơn
+          </div>
+        }
+      </div>
+
+      <form asp-action="WithdrawMoney" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="MaSoTietKiem" />
+
+        <div class="mb-3">
+          <label asp-for="SoTienRut" class="form-label">Số tiền muốn rút</label>
+          <input asp-for="SoTienRut" class="form-control" type="number" max="@ViewBag.TongTienNhanDuoc" min="100000" />
+          <span asp-validation-for="SoTienRut" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-cash me-2"></i>Xác nhận rút tiền
+          </button>
+          <a asp-action="Index" class="btn btn-primary">
+            <i class="bi bi-arrow-left me-2"></i>Quay lại
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
+
+@section Scripts {
+  @{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+  }
+}

@@ -27,8 +27,8 @@
               <label asp-for="SoTienGui" class="form-label fw-bold text-success">
                 <i class="bi bi-cash-stack me-2"></i> Số tiền gửi
               </label>
-              <input asp-for="SoTienGui" class="form-control" type="number" min="1000000"
-                placeholder="Ví dụ: 1000000 và tối thiểu là 1000000" />
+              <input asp-for="SoTienGui" class="form-control" type="text" min="1000000"
+                placeholder="Ví dụ: 1000000 và tối thiểu là 1000000" value="1000000" />
               <span asp-validation-for="SoTienGui" class="text-danger"></span>
             </div>
             @* Code STK tự động tạo trong hệ thống *@
