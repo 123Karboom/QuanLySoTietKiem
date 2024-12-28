@@ -5,44 +5,44 @@
 }
 
 <div class="container mt-5">
-    @* Thông báo chỗ này khi người dùng chưa được rút tiền *@
     @if (TempData["Message"] != null)
     {
-        <div class="alert alert-success">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
             @TempData["Message"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
-    <div class="card shadow">
-        <div class="card-header bg-success text-white">
+    <div class="card shadow-lg border-0 rounded-3">
+        <div class="card-header bg-gradient bg-success text-white py-3">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
-                    <i class="bi bi-list-ul fa-2x me-2"></i>
-                    <h3 class="mb-0">Danh Sách Sổ Tiết Kiệm</h3>
+                    <i class="bi bi-list-ul fa-2x me-3"></i>
+                    <h3 class="mb-0 fw-bold">Danh Sách Sổ Tiết Kiệm</h3>
                 </div>
-                <a asp-action="OpenSavingsAccount" class="btn btn-light">
-                    <i class="bi bi-plus-circle me-2"></i>Mở Sổ Mới
+                <a asp-action="OpenSavingsAccount" class="btn btn-light btn-lg">
+                    <i class="bi bi-plus-circle-fill me-2"></i>Mở Sổ Mới
                 </a>
             </div>
         </div>
-        <div class="card-body">
+        <div class="card-body p-4">
             @if (!Model.Any())
-
             {
                 <div class="text-center py-5">
-                    <i class="bi bi-inbox display-1 text-muted"></i>
-                    <p class="lead mt-3">Bạn chưa có sổ tiết kiệm nào</p>
-                    <a asp-action="OpenSavingsAccount" class="btn btn-primary mt-3">
-                        <i class="bi bi-plus-circle me-2"></i>Mở Sổ Tiết Kiệm Ngay
+                    <i class="bi bi-inbox display-1 text-muted mb-4"></i>
+                    <p class="lead fw-bold text-muted mb-4">Bạn chưa có sổ tiết kiệm nào</p>
+                    <a asp-action="OpenSavingsAccount" class="btn btn-success btn-lg">
+                        <i class="bi bi-plus-circle-fill me-2"></i>Mở Sổ Tiết Kiệm Ngay
                     </a>
                 </div>
             }
             else
             {
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover align-middle">
                         <thead class="table-light">
-                            <tr>
+                            <tr class="text-center">
                                 <th>Số Sổ</th>
                                 <th>Số Tiền Gửi</th>
                                 <th>Kỳ Hạn</th>
@@ -52,38 +52,35 @@
                                 <th>Ngày Đáo Hạn</th>
                                 <th>Hình thức đến hạn</th>
                                 <th>Hành Động</th>
-
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var item in Model)
                             {
-                                <tr>
-                                    <td>@item.MaSoTietKiem</td>
-                                    <td>@item.SoDuSoTietKiem.ToString("N0") VNĐ</td>
-                                    <td>@(item.KyHan > 0 ? $"{item.KyHan} tháng" : "N/A")</td>
-                                    <td>@item.Code</td>
-                                    <td>@(item.LaiSuatApDung * 100)%</td>
+                                <tr class="text-center">
+                                    <td><span class="badge bg-primary">@item.MaSoTietKiem</span></td>
+                                    <td class="fw-bold text-success">@item.SoDuSoTietKiem.ToString("N0") VNĐ</td>
+                                    <td>@(item.KyHan > 0 ? $"{item.KyHan} tháng" : "Không kỳ hạn")</td>
+                                    <td><span class="badge bg-secondary">@item.Code</span></td>
+                                    <td class="fw-bold">@item.LaiSuatApDung.ToString("P1")</td>
                                     <td>@item.NgayMoSo.ToString("dd/MM/yyyy")</td>
                                     <td>@item.NgayDaoHan.ToString("dd/MM/yyyy")</td>
-                                    <td>@item.TenHinhThucDenHan</td>
+                                    <td><span class="badge bg-info">@item.TenHinhThucDenHan</span></td>
                                     <td>
-                                        <a asp-action="Details" asp-route-id="@item.MaSoTietKiem" class="btn btn-sm btn-info">
-                                            <i class="bi bi-eye"></i>
-                                            Xem chi tiết
-                                        </a>
-                                        @* Thêm tiền vào tài khoản *@
-                                        <a asp-action="AddMoney" asp-route-id="@item.MaSoTietKiem"
-                                            class="btn btn-sm btn-success">
-                                            <i class="bi bi-plus-circle"></i>
-                                            Thêm tiền
-                                        </a>
-                                        @* Rút tiền *@
-                                        <a asp-action="WithdrawMoney" asp-route-id="@item.MaSoTietKiem"
-                                            class="btn btn-sm btn-danger">
-                                            <i class="bi bi-minus-circle"></i>
-                                            Rút tiền
-                                        </a>
+                                        <div class="btn-group">
+                                            <a asp-action="Details" asp-route-id="@item.MaSoTietKiem"
+                                                class="btn btn-outline-info btn-sm">
+                                                <i class="bi bi-eye-fill"></i>
+                                            </a>
+                                            <a asp-action="AddMoney" asp-route-id="@item.MaSoTietKiem"
+                                                class="btn btn-outline-success btn-sm">
+                                                <i class="bi bi-plus-circle-fill"></i>
+                                            </a>
+                                            <a asp-action="WithdrawMoney" asp-route-id="@item.MaSoTietKiem"
+                                                class="btn btn-outline-danger btn-sm">
+                                                <i class="bi bi-dash-circle-fill"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             }

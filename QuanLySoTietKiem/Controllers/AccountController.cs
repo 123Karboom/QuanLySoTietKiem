@@ -20,7 +20,7 @@ namespace QuanLySoTietKiem.Controllers
             _signInManager = signInManager;
             _accountService = accountService;
         }
-
+        //Đăng nhập
         [HttpGet]
         public IActionResult Login()
         {
@@ -30,7 +30,7 @@ namespace QuanLySoTietKiem.Controllers
             }
             return View();
         }
-
+        //Xử lý trang đăng nhập
         [HttpPost]
         public async Task<IActionResult> Login(LoginModel model)
         {
@@ -145,10 +145,10 @@ namespace QuanLySoTietKiem.Controllers
         [HttpGet]
         public IActionResult ForgotPassword()
         {
+
             return View();
         }
         // Forgot password
-
 
     }
 }

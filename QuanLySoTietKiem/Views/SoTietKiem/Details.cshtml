@@ -1,18 +1,8 @@
+@model QuanLySoTietKiem.Models.SavingsAccount.SoTietKiemDetailModel
 @{
   ViewData["Title"] = "Chi tiết sổ tiết kiệm";
   Layout = "~/Views/Shared/_UserLayout.cshtml";
 }
-
-<div class="container mt-5">
-  <div class="alert alert-warning">
-    <h4 class="alert-heading">Chức năng đang phát triển!</h4>
-    <p>Vui lòng thử lại sau. 😊</p>
-  </div>
-  <a asp-action="Index" class="btn btn-primary">
-    <i class="bi bi-arrow-left me-2"></i>Quay Lại Trang Danh Sách Sổ Tiết Kiệm  
-  </a>
-</div>
-@* 
 
 <div class="container mt-5">
   <div class="card shadow">
@@ -39,17 +29,29 @@
           </div>
           <div class="mb-3">
             <label class="fw-bold">Loại Sổ:</label>
-            <p>@Model.TenLoaiSo (@Model.KyHan tháng)</p>
+            <p>@if (@Model.KyHan == 0)
+              {
+                <span>Không kỳ hạn</span>
+              }
+              else
+              {
+                <span>@Model.KyHan tháng</span>
+              }
+            </p>
+          </div>
+          <div class="mb-3">
+            <label class="fw-bold">Số tiền thực hưởng nếu rút hôm nay:</label>
+            <p>@Model.SoTienThucHuong.ToString("N0") VNĐ</p>
           </div>
         </div>
         <div class="col-md-6">
           <div class="mb-3">
-            <label class="fw-bold">Hình Thức Đến Hạn:</label>
+            <label class="fw-bold">Hình Thức Đáo Hạn:</label>
             <p>@Model.TenHinhThucDenHan</p>
           </div>
           <div class="mb-3">
             <label class="fw-bold">Lãi Suất Áp Dụng:</label>
-            <p>@(Model.LaiSuatApDung * 100)%</p>
+            <p>@Model.LaiSuatApDung.ToString("P1")</p>
           </div>
           <div class="mb-3">
             <label class="fw-bold">Ngày Mở Sổ:</label>
@@ -57,7 +59,7 @@
           </div>
           <div class="mb-3">
             <label class="fw-bold">Ngày Đáo Hạn:</label>
-            <p>@Model.NgayMoSo.AddMonths(Model.KyHan).ToString("dd/MM/yyyy")</p>
+            <p>@Model.NgayDaoHan.ToString("dd/MM/yyyy")</p>
           </div>
           <div class="mb-3">
             <label class="fw-bold">Trạng Thái:</label>
@@ -81,10 +83,10 @@
         @if (Model.TrangThai)
         {
           <div>
-            <a asp-action="Deposit" asp-route-id="@Model.MaSoTietKiem" class="btn btn-success me-2">
+            <a asp-action="AddMoney" asp-route-id="@Model.MaSoTietKiem" class="btn btn-success me-2">
               <i class="bi bi-cash me-2"></i>Gửi Thêm
             </a>
-            <a asp-action="Withdraw" asp-route-id="@Model.MaSoTietKiem" class="btn btn-warning">
+            <a asp-action="WithdrawMoney" asp-route-id="@Model.MaSoTietKiem" class="btn btn-warning">
               <i class="bi bi-cash-stack me-2"></i>Rút Tiền
             </a>
           </div>
@@ -92,4 +94,4 @@
       </div>
     </div>
   </div>
-</div> *@
+</div>
