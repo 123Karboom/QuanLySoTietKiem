@@ -1,9 +1,11 @@
-﻿using Helpers;
+﻿using System.Diagnostics;
+using Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using Models.RutTien;
 using QuanLySoTietKiem.Data;
 using QuanLySoTietKiem.Entity;
@@ -57,6 +59,44 @@ namespace QuanLySoTietKiem.Controllers
                 TenHinhThucDenHan = stk.HinhThucDenHan?.TenHinhThucDenHan ?? ""
             });
             return View(model);
+        }
+        public async Task<IActionResult> XuLyDaoHan(int maSoTietKiem)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var soTietKiem = await _context.SoTietKiems
+                    .Include(s => s.LoaiSoTietKiem)
+                    .FirstOrDefaultAsync(s => s.MaSoTietKiem == maSoTietKiem);
+
+                if (soTietKiem == null)
+                {
+                    return NotFound();
+                }
+
+                // Tính tiền lãi
+                var soNgayGui = (DateTime.Now - soTietKiem.NgayMoSo).Days;
+                decimal tienLai = LaiSuatHelper.TinhTienLai(
+                    soTietKiem.SoDuSoTietKiem,
+                    soTietKiem.LaiSuatKyHan,
+                    soNgayGui
+                );
+
+                // Xử lý đáo hạn
+                DaoHanHelper.XuLyDaoHan(soTietKiem, tienLai);
+
+                // Lưu thay đổi vào database
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                // Log error và xử lý exception
+                return View("Error");
+            }
         }
 
         [HttpGet]
@@ -226,14 +266,13 @@ namespace QuanLySoTietKiem.Controllers
             );
             _logger.LogInformation("Laisuatkyhan: {Laisuatkyhan}", soTietKiem.LaiSuatKyHan);
             var soNgayGui = (DateTime.Now - soTietKiem.NgayMoSo).Days;
-            // Tính tiền lãi
             decimal tienLai = LaiSuatHelper.TinhTienLai(
                 soTietKiem.SoDuSoTietKiem,
                 laiSuatApDung,
                 soNgayGui
             );
             _logger.LogInformation("SoDuSoTietkiem: {SoDuSoTietkiem}", soTietKiem.SoDuSoTietKiem);
-            _logger.LogInformation("LaiSuatApDung: {LaiSuatApDung}", laiSuatApDung);
+            _logger.LogInformation("LaiSuatApDung123: {LaiSuatApDung}", laiSuatApDung);
             _logger.LogInformation("NgayDongSo: {NgayDongSo}", soTietKiem.NgayDongSo);
             _logger.LogInformation("soNgayGui: {soNgayGui}", soNgayGui);
             _logger.LogInformation("TienLai: {TienLai}", tienLai);
@@ -283,9 +322,6 @@ namespace QuanLySoTietKiem.Controllers
             }
             ViewBag.CodeSTK = await _soTietKiemService.GetCodeSTK(currentUser.Id, id);
             ViewBag.SoDuHienTai = currentUser.SoDuTaiKhoan;
-
-
-
 
 
             if (soTietKiem == null)
@@ -387,6 +423,7 @@ namespace QuanLySoTietKiem.Controllers
         [Authorize(Roles = "User")]
         public async Task<IActionResult> WithdrawMoney(int id)
         {
+            Debug.WriteLine("=>>>>>>>>>>>>>>>>>>>>>WithdrawMoney");
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
             {
@@ -425,11 +462,117 @@ namespace QuanLySoTietKiem.Controllers
                 (DateTime.Now - soTietKiem.NgayMoSo).Days
             );
 
+
+            // Nếu rút đúng ngày đáo hạn
+            var check = DateTime.Now.Date == soTietKiem.NgayDaoHan.Date;
+            Debug.WriteLine("=>>>>>>>>>>>>>>>>>>>>>check: " + check);
+            if (DateTime.Now.Date == soTietKiem.NgayDaoHan.Date)
+            {
+
+                Debug.WriteLine("=>>>>>>>>>>>>>>>>>>>>>Rút đúng ngày đáo hạn");
+                // Xử lý theo hình thức đáo hạn
+                DaoHanHelper.XuLyDaoHan(soTietKiem, tienLai);
+
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                // Xử lý rút tiền bình thường
+                soTietKiem.SoDuSoTietKiem -= model.SoTienRut;
+            }
+
             ViewBag.LaiSuatApDung = laiSuatApDung;
             ViewBag.TienLai = tienLai;
             ViewBag.TongTienNhanDuoc = soTietKiem.SoDuSoTietKiem + tienLai;
 
             return View(model);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> WithdrawMoney(WithdrawMoneyViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var soTietKiem = await _context.SoTietKiems
+                .Include(s => s.LoaiSoTietKiem)
+                .FirstOrDefaultAsync(s => s.MaSoTietKiem == model.MaSoTietKiem);
+
+            if (soTietKiem == null)
+            {
+                return NotFound();
+            }
+
+            // Tính lãi suất áp dụng
+            decimal laiSuatApDung = LaiSuatHelper.TinhLaiSuatRutTien(
+                soTietKiem.NgayMoSo,
+                soTietKiem.NgayDaoHan,
+                DateTime.Now,
+                soTietKiem.LaiSuatKyHan
+            );
+
+            // Tính tiền lãi
+            decimal tienLai = LaiSuatHelper.TinhTienLai(
+                soTietKiem.SoDuSoTietKiem,
+                laiSuatApDung,
+                (DateTime.Now - soTietKiem.NgayMoSo).Days
+            );
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // Kiểm tra số tiền rút có hợp lệ
+                if (model.SoTienRut > soTietKiem.SoDuSoTietKiem)
+                {
+                    ModelState.AddModelError("SoTienRut", "Số tiền rút không được lớn hơn số dư");
+                    return View(model);
+                }
+
+                // Cập nhật số dư sổ tiết kiệm
+                soTietKiem.SoDuSoTietKiem -= model.SoTienRut;
+
+                // Cộng tiền vào tài khoản người dùng
+                currentUser.SoDuTaiKhoan += (double)(model.SoTienRut + tienLai);
+                await _userManager.UpdateAsync(currentUser);
+
+                // Tạo giao dịch mới
+                var giaoDich = new GiaoDich
+                {
+                    MaSoTietKiem = model.MaSoTietKiem,
+                    MaLoaiGiaoDich = 1, // 1 là mã loại giao dịch rút tiền
+                    NgayGiaoDich = DateTime.Now,
+                    SoTien = (double)model.SoTienRut
+                };
+
+                // Nếu rút hết, đóng sổ
+                if (soTietKiem.SoDuSoTietKiem == 0)
+                {
+                    soTietKiem.TrangThai = false;
+                    soTietKiem.NgayDongSo = DateTime.Now;
+                }
+
+                await _context.GiaoDichs.AddAsync(giaoDich);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                _logger.LogError(ex, "Lỗi khi rút tiền từ sổ tiết kiệm");
+                ModelState.AddModelError("", "Có lỗi xảy ra khi rút tiền. Vui lòng thử lại sau.");
+                return View(model);
+            }
         }
 
     }

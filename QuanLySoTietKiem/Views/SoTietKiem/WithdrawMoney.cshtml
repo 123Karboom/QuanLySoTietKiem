@@ -11,8 +11,14 @@
         <i class="bi bi-cash-stack me-2"></i>
         <h3 class="mb-0">Rút Tiền - Sổ @Model.Code</h3>
       </div>
-    </div>
 
+    </div>
+    @if (DateTime.Now.Date >= Model.NgayDaoHan.Date)
+    {
+      <a asp-action="XuLyDaoHan" asp-route-maSoTietKiem="@Model.MaSoTietKiem" class="btn btn-primary">
+        Xử lý đáo hạn
+      </a>
+    }
     <div class="card-body">
       <div class="alert alert-info">
         <h5>Thông tin rút tiền:</h5>
@@ -41,7 +47,7 @@
 
         <div class="mb-3">
           <label asp-for="SoTienRut" class="form-label">Số tiền muốn rút</label>
-          <input asp-for="SoTienRut" class="form-control" type="number" max="@ViewBag.TongTienNhanDuoc" min="100000" />
+          <input asp-for="SoTienRut" class="form-control" type="number" max="@ViewBag.TongTienNhanDuoc" />
           <span asp-validation-for="SoTienRut" class="text-danger"></span>
         </div>
 
