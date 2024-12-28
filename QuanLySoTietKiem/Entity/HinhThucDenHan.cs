@@ -9,6 +9,6 @@ public class HinhThucDenHan
     [Required]
     [MinLength(1), MaxLength(50)]
     public string? TenHinhThucDenHan { get; set; }
-    
+
     public virtual ICollection<SoTietKiem>? SoTietKiems { get; set; }
 }
