@@ -17,6 +17,7 @@ namespace QuanLySoTietKiem.Data
         public DbSet<HinhThucDenHan> HinhThucDenHans { get; set; }
         public DbSet<LoaiGiaoDich> LoaiGiaoDichs { get; set; }
         public DbSet<GiaoDich> GiaoDichs { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -35,6 +36,8 @@ namespace QuanLySoTietKiem.Data
             modelBuilder.Entity<BaoCaoThang>().Property(b => b.TongSoTienRut).HasPrecision(18, 2);
             modelBuilder.Entity<SoTietKiem>().Property(s => s.LaiSuatApDung).HasPrecision(18, 3);
             modelBuilder.Entity<GiaoDich>().Property(g => g.SoTien).HasPrecision(18, 2);
+
+
 
             //  Seed data for HinhThucDenHan
             modelBuilder.Entity<HinhThucDenHan>().HasData(

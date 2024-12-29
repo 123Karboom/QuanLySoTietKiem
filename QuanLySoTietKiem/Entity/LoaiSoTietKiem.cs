@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+
 namespace QuanLySoTietKiem.Models
 {
     public class LoaiSoTietKiem
@@ -18,8 +19,11 @@ namespace QuanLySoTietKiem.Models
         [Required]
         public decimal SoTienGuiToiThieu { get; set; } //Example: 10000000
 
+        //Navigation Properties
+
         public virtual ICollection<BaoCaoNgay>? BaoCaoNgays { get; set; }
         public virtual ICollection<BaoCaoThang>? BaoCaoThangs { get; set; }
         public virtual ICollection<SoTietKiem>? SoTietKiems { get; set; }
+
     }
 }

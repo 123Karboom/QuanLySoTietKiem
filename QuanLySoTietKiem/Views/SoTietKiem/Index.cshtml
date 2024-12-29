@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<QuanLySoTietKiem.Models.SoTietKiemModel>
 @{
-    ViewData["Title"] = "Quản lý sổ tiết kiệm";
+    ViewData["Title"] = "Sổ Tiết Kiệm";
     Layout = "~/Views/Shared/_UserLayout.cshtml";
 }
 
@@ -22,7 +22,7 @@
                     <h3 class="mb-0 fw-bold">Danh Sách Sổ Tiết Kiệm</h3>
                 </div>
                 <a asp-action="OpenSavingsAccount" class="btn btn-light btn-lg">
-                    <i class="bi bi-plus-circle-fill me-2"></i>Mở Sổ Mới
+                    <i class="bi bi-plus-circle-fill me-2"></i>Mở sổ tiết kiệm
                 </a>
             </div>
         </div>
@@ -46,7 +46,7 @@
                                 <th>Số Sổ</th>
                                 <th>Số Tiền Gửi</th>
                                 <th>Kỳ Hạn</th>
-                                <th>Code STK</th>
+                                @* <th>Code STK</th> *@
                                 <th>Lãi Suất</th>
                                 <th>Ngày Mở Sổ</th>
                                 <th>Ngày Đáo Hạn</th>
@@ -61,24 +61,21 @@
                                     <td><span class="badge bg-primary">@item.MaSoTietKiem</span></td>
                                     <td class="fw-bold text-success">@item.SoDuSoTietKiem.ToString("N0") VNĐ</td>
                                     <td>@(item.KyHan > 0 ? $"{item.KyHan} tháng" : "Không kỳ hạn")</td>
-                                    <td><span class="badge bg-secondary">@item.Code</span></td>
+                                    @* <td><span class="badge bg-secondary">@item.Code</span></td> *@
                                     <td class="fw-bold">@item.LaiSuatApDung.ToString("P1")</td>
                                     <td>@item.NgayMoSo.ToString("dd/MM/yyyy")</td>
                                     <td>@item.NgayDaoHan.ToString("dd/MM/yyyy")</td>
-                                    <td><span class="badge bg-info">@item.TenHinhThucDenHan</span></td>
+                                    <td><span class="badge bg-success">@item.TenHinhThucDenHan</span></td>
                                     <td>
                                         <div class="btn-group">
                                             <a asp-action="Details" asp-route-id="@item.MaSoTietKiem"
-                                                class="btn btn-outline-info btn-sm">
+                                                class="btn btn-outline-primary btn-sm">
                                                 <i class="bi bi-eye-fill"></i>
                                             </a>
-                                            <a asp-action="AddMoney" asp-route-id="@item.MaSoTietKiem"
+
+                                            <a asp-action="WithdrawMoney" asp-route-id="@item.MaSoTietKiem"
                                                 class="btn btn-outline-success btn-sm">
                                                 <i class="bi bi-plus-circle-fill"></i>
-                                            </a>
-                                            <a asp-action="WithdrawMoney" asp-route-id="@item.MaSoTietKiem"
-                                                class="btn btn-outline-danger btn-sm">
-                                                <i class="bi bi-dash-circle-fill"></i>
                                             </a>
                                         </div>
                                     </td>
