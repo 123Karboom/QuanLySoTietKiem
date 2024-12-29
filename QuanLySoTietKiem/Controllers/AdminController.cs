@@ -196,5 +196,94 @@ namespace QuanLySoTietKiem.Controllers
                     $"BaoCaoNgay_{date:ddMMyyyy}.xlsx");
             }
         }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ReportByMonth()
+        {
+            var today = DateTime.Today;
+            var report = await GenerateMonthlyReport(today.Month, today.Year);
+            return View(report);
+
+        }
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ReportByMonth(int month, int year)
+        {
+            var report = await GenerateMonthlyReport(month, year);
+            return View(report);
+        }
+
+        private async Task<BaoCaoThang> GenerateMonthlyReport(int month, int year)
+        {
+            var startDate = new DateTime(year, month, 1);
+            var endDate = startDate.AddMonths(1).AddDays(-1);
+
+            var transactions = await _context.GiaoDichs
+            .Include(g => g.SoTietKiem)
+            .ThenInclude(s => s.LoaiSoTietKiem)
+            .Where(g => g.NgayGiaoDich >= startDate && g.NgayGiaoDich <= endDate)
+            .ToListAsync();
+
+            // Calculate totals
+            decimal tongTienGui = transactions
+                .Where(t => t.MaLoaiGiaoDich == 2) // Mã 2 là giao dịch gửi tiền
+                .Sum(t => (decimal)t.SoTien);
+
+            decimal tongTienRut = transactions
+            .Where(t => t.MaLoaiGiaoDich == 1) // Mã 1 là giao dịch rút tiền
+            .Sum(t => (decimal)t.SoTien);
+
+            var soLuongMo = await _context.SoTietKiems.CountAsync(s => s.NgayDongSo.HasValue && s.NgayDongSo.Value.Month == month && s.NgayDongSo.Value.Year == year);
+
+            var soLuongDong = await _context.SoTietKiems.CountAsync(s => s.NgayDongSo.HasValue && s.NgayDongSo.Value.Month == month && s.NgayDongSo.Value.Year == year);
+            var report = new BaoCaoThang
+            {
+                Thang = month,
+                Nam = year,
+                TongTienGui = tongTienGui,
+                TongTienRut = tongTienRut,
+                ChenhLech = tongTienGui - tongTienRut,
+                SoLuongMo = 0, // Số lượng sổ mở
+                SoLuongDong = 0, // Số lượng sổ đóng
+                NgayTaoBaoCao = DateTime.Now
+            };
+            return report;
+        }
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ExportMonthlyReportToPdf(int month, int year)
+        {
+            var report = await GenerateMonthlyReport(month, year);
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                Document document = new Document(PageSize.A4, 25, 25, 30, 30);
+                PdfWriter writer = PdfWriter.GetInstance(document, ms);
+
+                document.Open();
+
+                // Add title
+                var titleFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 18);
+                var title = new Paragraph($"Báo Cáo Tháng {month}/{year}", titleFont);
+                title.Alignment = Element.ALIGN_CENTER;
+                document.Add(title);
+                document.Add(new Paragraph("\n"));
+
+                // Add content
+                var contentFont = FontFactory.GetFont(FontFactory.HELVETICA, 12);
+                document.Add(new Paragraph($"Tổng tiền gửi: {report.TongTienGui:N0} VNĐ", contentFont));
+                document.Add(new Paragraph($"Tổng tiền rút: {report.TongTienRut:N0} VNĐ", contentFont));
+                document.Add(new Paragraph($"Chênh lệch: {report.ChenhLech:N0} VNĐ", contentFont));
+                document.Add(new Paragraph($"Số lượng sổ mở mới: {report.SoLuongMo}", contentFont));
+                document.Add(new Paragraph($"Số lượng sổ đóng: {report.SoLuongDong}", contentFont));
+                document.Add(new Paragraph($"Thời điểm tạo báo cáo: {report.NgayTaoBaoCao:dd/MM/yyyy HH:mm:ss}", contentFont));
+
+                document.Close();
+                writer.Close();
+
+                return File(ms.ToArray(), "application/pdf", $"BaoCaoThang_{month}_{year}.pdf");
+            }
+        }
     }
 }
