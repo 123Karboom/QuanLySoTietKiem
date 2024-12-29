@@ -64,7 +64,15 @@
               <label asp-for="MaLoaiSo" class="form-label fw-bold text-success">
                 <i class="bi bi-cash-stack me-2"></i>Loại sổ tiết kiệm
               </label>
-              <select asp-for="MaLoaiSo" class="form-select" asp-items="ViewBag.LoaiSoTietKiemOptions"></select>
+              <select asp-for="MaLoaiSo" class="form-select">
+                @foreach (var item in (SelectList)ViewBag.LoaiSoTietKiemOptions)
+                {
+                  if (item.Text != "Không kỳ hạn")
+                  {
+                    <option value="@item.Value">@item.Text</option>
+                  }
+                }
+              </select>
               <span asp-validation-for="MaLoaiSo" class="text-danger"></span>
             </div>
 
@@ -86,3 +94,10 @@
 @section Scripts {
   <partial name="_ValidationScriptsPartial" />
 }
+
+<script>
+  $(document).ready(function () {
+    $('#MaHinhThucDenHan').select2();
+    $('#MaLoaiSo').select2();
+  });
+</script>

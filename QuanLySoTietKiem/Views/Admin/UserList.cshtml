@@ -2,7 +2,7 @@
   ViewData["Title"] = "User List";
   Layout = "_AdminLayout";
 }
-<h2 class="text-center">User List</h2>
+<h2 class="text-center">Danh sách người dùng</h2>
 @* Search Form *@
 <form asp-action="Index" method="get" class="form-inline mb-3">
   <input type="text" name="searchString" class="form-control mr-sm-2" placeholder="Search users..."
@@ -14,11 +14,10 @@
   <thead>
     <tr>
       <th>ID</th>
-      <th>Username</th>
+      <th>Họ tên</th>
       <th>Email</th>
-      <th>Full Name</th>
-      <th>Phone Number</th>
-      <th>Address</th>
+      <th>Số điện thoại</th>
+      <th>Địa chỉ</th>
       <th>Action</th>
     </tr>
   </thead>

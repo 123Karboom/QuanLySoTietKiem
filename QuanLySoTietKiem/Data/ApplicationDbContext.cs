@@ -32,8 +32,8 @@ namespace QuanLySoTietKiem.Data
             modelBuilder.Entity<SoTietKiem>().Property(s => s.SoDuSoTietKiem).HasPrecision(18, 2);
             modelBuilder.Entity<SoTietKiem>().Property(s => s.SoTienGui).HasPrecision(18, 2);
             modelBuilder.Entity<SoTietKiem>().Property(s => s.LaiSuatKyHan).HasPrecision(18, 3);
-            modelBuilder.Entity<BaoCaoThang>().Property(b => b.TongSoTienGui).HasPrecision(18, 2);
-            modelBuilder.Entity<BaoCaoThang>().Property(b => b.TongSoTienRut).HasPrecision(18, 2);
+            modelBuilder.Entity<BaoCaoThang>().Property(b => b.TongTienGui).HasPrecision(18, 2);
+            modelBuilder.Entity<BaoCaoThang>().Property(b => b.TongTienRut).HasPrecision(18, 2);
             modelBuilder.Entity<SoTietKiem>().Property(s => s.LaiSuatApDung).HasPrecision(18, 3);
             modelBuilder.Entity<GiaoDich>().Property(g => g.SoTien).HasPrecision(18, 2);
 

@@ -20,10 +20,10 @@ namespace QuanLySoTietKiem.Models
         public int SoLuongDong { get; set; }
         [Required]
         [Range(0, double.MaxValue)]
-        public decimal TongSoTienGui { get; set; }
+        public decimal TongTienGui { get; set; }
         [Required]
         [Range(0, double.MaxValue)]
-        public decimal TongSoTienRut { get; set; }
+        public decimal TongTienRut { get; set; }
         [Required]
         public DateTime NgayTaoBaoCao { get; set; }
         [Required]
