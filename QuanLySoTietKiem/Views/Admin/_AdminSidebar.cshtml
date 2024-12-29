@@ -7,7 +7,7 @@
   <li class="nav-item">
     <a asp-controller="Admin" asp-action="Dashboard" class="nav-link">
       <i class="bi bi-house"></i>
-      <span>Dashboard</span>
+      <span>Trang quản trị</span>
     </a>
   </li>
   <li class="nav-item dropdown">
@@ -17,6 +17,9 @@
       <span>Report</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="reportDropdown">
+      <li>
+        <a class="dropdown-item" asp-controller="Admin" asp-action="ReportByDay">Báo cáo ngày</a>
+      </li>
       <li>
         <a class="dropdown-item" asp-controller="Admin" asp-action="ReportByMonth">Report by Month</a>
       </li>
