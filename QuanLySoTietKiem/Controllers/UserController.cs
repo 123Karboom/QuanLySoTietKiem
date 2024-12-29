@@ -128,5 +128,13 @@ namespace QuanLySoTietKiem.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        [Authorize(Roles = "User")]
+        public IActionResult QuyDinhVaDieuKhoan()
+        {
+            ViewBag.QuyDinh = "Quy định và điều khoản";
+            return View();
+        }
+
     }
 }

@@ -35,8 +35,15 @@ namespace QuanLySoTietKiem.Controllers
         }
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public IActionResult Dashboard()
+        public async Task<IActionResult> Dashboard()
         {
+            var (deposits, withdrawals) = await GetTransactionDataByMonth();
+            Console.WriteLine("deposits: ");
+            Console.WriteLine(deposits);
+            Console.WriteLine("withdrawals: ");
+            Console.WriteLine(withdrawals);
+            ViewBag.MonthlyDeposits = deposits;
+            ViewBag.MonthlyWithdrawals = withdrawals;
             return View();
         }
         [HttpGet]
@@ -284,6 +291,43 @@ namespace QuanLySoTietKiem.Controllers
 
                 return File(ms.ToArray(), "application/pdf", $"BaoCaoThang_{month}_{year}.pdf");
             }
+        }
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public IActionResult ThayDoiQuyDinh()
+        {
+            return View();
+        }
+        private async Task<(List<decimal> deposits, List<decimal> withdrawals)> GetTransactionDataByMonth()
+        {
+            var currentYear = DateTime.Now.Year;
+            var deposits = new List<decimal>();
+            var withdrawals = new List<decimal>();
+
+            for (int month = 1; month <= 12; month++)
+            {
+                var startDate = new DateTime(currentYear, month, 1);
+                var endDate = startDate.AddMonths(1).AddDays(-1);
+
+                // Tính tổng tiền gửi trong tháng
+                var monthlyDeposits = await _context.GiaoDichs
+                    .Where(g => g.NgayGiaoDich.Month == month
+                            && g.NgayGiaoDich.Year == currentYear
+                            && g.MaLoaiGiaoDich == 2) // 2 là mã giao dịch gửi tiền
+                    .SumAsync(g => (decimal)g.SoTien);
+
+                // Tính tổng tiền rút trong tháng
+                var monthlyWithdrawals = await _context.GiaoDichs
+                    .Where(g => g.NgayGiaoDich.Month == month
+                            && g.NgayGiaoDich.Year == currentYear
+                            && g.MaLoaiGiaoDich == 1) // 1 là mã giao dịch rút tiền
+                    .SumAsync(g => (decimal)g.SoTien);
+
+                deposits.Add(monthlyDeposits);
+                withdrawals.Add(monthlyWithdrawals);
+            }
+
+            return (deposits, withdrawals);
         }
     }
 }
