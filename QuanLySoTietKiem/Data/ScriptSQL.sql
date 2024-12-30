@@ -7,7 +7,7 @@ create table AspNetRoles
     NormalizedName   nvarchar(256),
     ConcurrencyStamp nvarchar(max)
 )
-go
+    go
 
 create table AspNetRoleClaims
 (
@@ -21,11 +21,11 @@ create table AspNetRoleClaims
     ClaimType  nvarchar(max),
     ClaimValue nvarchar(max)
 )
-go
+    go
 
 create index IX_AspNetRoleClaims_RoleId
     on AspNetRoleClaims (RoleId)
-go
+    go
 
 create unique index RoleNameIndex
     on AspNetRoles (NormalizedName)
@@ -56,7 +56,7 @@ create table AspNetUsers
     LockoutEnabled       bit           not null,
     AccessFailedCount    int           not null
 )
-go
+    go
 
 create table AspNetUserClaims
 (
@@ -70,16 +70,16 @@ create table AspNetUserClaims
     ClaimType  nvarchar(max),
     ClaimValue nvarchar(max)
 )
-go
+    go
 
 create index IX_AspNetUserClaims_UserId
     on AspNetUserClaims (UserId)
-go
+    go
 
 create table AspNetUserLogins
 (
-    LoginProvider       nvarchar(128) not null,
-    ProviderKey         nvarchar(128) not null,
+    LoginProvider       nvarchar(450) not null,
+    ProviderKey         nvarchar(450) not null,
     ProviderDisplayName nvarchar(max),
     UserId              nvarchar(450) not null
         constraint FK_AspNetUserLogins_AspNetUsers_UserId
@@ -88,11 +88,11 @@ create table AspNetUserLogins
     constraint PK_AspNetUserLogins
         primary key (LoginProvider, ProviderKey)
 )
-go
+    go
 
 create index IX_AspNetUserLogins_UserId
     on AspNetUserLogins (UserId)
-go
+    go
 
 create table AspNetUserRoles
 (
@@ -107,11 +107,11 @@ create table AspNetUserRoles
     constraint PK_AspNetUserRoles
         primary key (UserId, RoleId)
 )
-go
+    go
 
 create index IX_AspNetUserRoles_RoleId
     on AspNetUserRoles (RoleId)
-go
+    go
 
 create table AspNetUserTokens
 (
@@ -119,22 +119,40 @@ create table AspNetUserTokens
         constraint FK_AspNetUserTokens_AspNetUsers_UserId
             references AspNetUsers
             on delete cascade,
-    LoginProvider nvarchar(128) not null,
-    Name          nvarchar(128) not null,
+    LoginProvider nvarchar(450) not null,
+    Name          nvarchar(450) not null,
     Value         nvarchar(max),
     constraint PK_AspNetUserTokens
         primary key (UserId, LoginProvider, Name)
 )
-go
+    go
 
 create index EmailIndex
     on AspNetUsers (NormalizedEmail)
-go
+    go
 
 create unique index UserNameIndex
     on AspNetUsers (NormalizedUserName)
     where [NormalizedUserName] IS NOT NULL
 go
+
+create table HinhThucDenHans
+(
+    MaHinhThucDenHan  int identity
+        constraint PK_HinhThucDenHans
+            primary key,
+    TenHinhThucDenHan nvarchar(50) not null
+)
+    go
+
+create table LoaiGiaoDichs
+(
+    MaLoaiGiaoDich  int identity
+        constraint PK_LoaiGiaoDichs
+            primary key,
+    TenLoaiGiaoDich nvarchar(100) not null
+)
+    go
 
 create table LoaiSoTietKiems
 (
@@ -142,30 +160,32 @@ create table LoaiSoTietKiems
         constraint PK_LoaiSoTietKiems
             primary key,
     TenLoaiSo           nvarchar(max)  not null,
-    LaiSuat             real           not null,
+    LaiSuat             float          not null,
     KyHan               int            not null,
     ThoiGianGuiToiThieu int            not null,
     SoTienGuiToiThieu   decimal(18, 2) not null
 )
-go
+    go
 
 create table BaoCaoNgays
 (
-    MaBaoCaoNgay int identity
+    MaBaoCaoNgay  int identity
         constraint PK_BaoCaoNgays
             primary key,
-    MaLoaiSo     int            not null
+    MaLoaiSo      int            not null
         constraint FK_BaoCaoNgays_LoaiSoTietKiems_MaLoaiSo
             references LoaiSoTietKiems
             on delete cascade,
-    NgayGhi      datetime2      not null,
-    SoTienGui    decimal(18, 2) not null
+    Ngay          datetime2      not null,
+    TongTienGui   decimal(18, 2) not null,
+    TongTienRut   decimal(18, 2) not null,
+    NgayTaoBaoCao datetime2      not null
 )
-go
+    go
 
 create index IX_BaoCaoNgays_MaLoaiSo
     on BaoCaoNgays (MaLoaiSo)
-go
+    go
 
 create table BaoCaoThangs
 (
@@ -176,81 +196,87 @@ create table BaoCaoThangs
         constraint FK_BaoCaoThangs_LoaiSoTietKiems_MaLoaiSo
             references LoaiSoTietKiems
             on delete cascade,
-    Thang         nvarchar(max)  not null,
+    Thang         int            not null,
+    Nam           int            not null,
     SoLuongDong   int            not null,
-    SoTienGui     decimal(18, 2) not null,
-    ChenhLech     decimal(18, 2) not null
+    TongSoTienGui decimal(18, 2) not null,
+    TongSoTienRut decimal(18, 2) not null,
+    NgayTaoBaoCao datetime2      not null,
+    ChenhLech     decimal(18, 2) not null,
+    SoLuongMo     int default 0  not null
 )
-go
+    go
 
 create index IX_BaoCaoThangs_MaLoaiSo
     on BaoCaoThangs (MaLoaiSo)
-go
+    go
 
 create table SoTietKiems
 (
-    MaSoTietKiem   int identity
+    MaSoTietKiem     int identity
         constraint PK_SoTietKiems
             primary key,
-    MaLoaiSo       int            not null
+    Code             nvarchar(max)                                   not null,
+    MaLoaiSo         int                                             not null
         constraint FK_SoTietKiems_LoaiSoTietKiems_MaLoaiSo
             references LoaiSoTietKiems
             on delete cascade,
-    SoDuSoTietKiem decimal(18, 2) not null,
-    TrangThai      bit            not null,
-    LaiSuatApDung  real           not null,
-    NgayMoSo       datetime2      not null,
-    NgayDongSo     datetime2      not null,
-    UserId         nvarchar(450)  not null
+    SoDuSoTietKiem   decimal(18, 2)                                  not null,
+    SoTienGui        decimal(18, 2)                                  not null,
+    LaiSuatKyHan     decimal(18, 3)                                  not null,
+    TrangThai        bit                                             not null,
+    LaiSuatApDung    decimal(18, 3)                                  not null,
+    NgayMoSo         datetime2                                       not null,
+    NgayDongSo       datetime2,
+    UserId           nvarchar(450)                                   not null
         constraint FK_SoTietKiems_AspNetUsers_UserId
             references AspNetUsers
-            on delete cascade
+            on delete cascade,
+    MaHinhThucDenHan int       default 0                             not null
+        constraint FK_SoTietKiems_HinhThucDenHans_MaHinhThucDenHan
+            references HinhThucDenHans
+            on delete cascade,
+    NgayDaoHan       datetime2 default '0001-01-01T00:00:00.0000000' not null
 )
-go
+    go
 
-create table PhieuGuiTiens
+create table GiaoDichs
 (
-    MaPhieuGui   int identity
-        constraint PK_PhieuGuiTiens
+    MaGiaoDich     int identity
+        constraint PK_GiaoDichs
             primary key,
-    MaSoTietKiem int            not null
-        constraint FK_PhieuGuiTiens_SoTietKiems_MaSoTietKiem
+    MaSoTietKiem   int       not null
+        constraint FK_GiaoDichs_SoTietKiems_MaSoTietKiem
             references SoTietKiems
             on delete cascade,
-    NgayGui      datetime2      not null,
-    SoTienGui    decimal(18, 2) not null
-)
-go
-
-create index IX_PhieuGuiTiens_MaSoTietKiem
-    on PhieuGuiTiens (MaSoTietKiem)
-go
-
-create table PhieuRutTiens
-(
-    MaPhieuRut   int identity
-        constraint PK_PhieuRutTiens
-            primary key,
-    MaSoTietKiem int            not null
-        constraint FK_PhieuRutTiens_SoTietKiems_MaSoTietKiem
-            references SoTietKiems
+    MaLoaiGiaoDich int       not null
+        constraint FK_GiaoDichs_LoaiGiaoDichs_MaLoaiGiaoDich
+            references LoaiGiaoDichs
             on delete cascade,
-    NgayRut      datetime2      not null,
-    SoTienRut    decimal(18, 2) not null
+    NgayGiaoDich   datetime2 not null,
+    SoTien         real      not null
 )
-go
+    go
 
-create index IX_PhieuRutTiens_MaSoTietKiem
-    on PhieuRutTiens (MaSoTietKiem)
-go
+create index IX_GiaoDichs_MaLoaiGiaoDich
+    on GiaoDichs (MaLoaiGiaoDich)
+    go
+
+create index IX_GiaoDichs_MaSoTietKiem
+    on GiaoDichs (MaSoTietKiem)
+    go
 
 create index IX_SoTietKiems_MaLoaiSo
     on SoTietKiems (MaLoaiSo)
-go
+    go
 
 create index IX_SoTietKiems_UserId
     on SoTietKiems (UserId)
-go
+    go
+
+create index IX_SoTietKiems_MaHinhThucDenHan
+    on SoTietKiems (MaHinhThucDenHan)
+    go
 
 create table __EFMigrationsHistory
 (
@@ -259,7 +285,7 @@ create table __EFMigrationsHistory
             primary key,
     ProductVersion nvarchar(32)  not null
 )
-go
+    go
 
 create table sysdiagrams
 (
@@ -272,7 +298,7 @@ create table sysdiagrams
     constraint UK_principal_name
         unique (principal_id, name)
 )
-go
+    go
 
 exec sp_addextendedproperty 'microsoft_database_tools_support', 1, 'SCHEMA', 'dbo', 'TABLE', 'sysdiagrams'
 go
