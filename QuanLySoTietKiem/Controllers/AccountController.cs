@@ -34,6 +34,11 @@ namespace QuanLySoTietKiem.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginModel model)
         {
+            if(!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByNameAsync(model.UserName);
