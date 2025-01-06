@@ -9,6 +9,7 @@ public class WithdrawMoneyViewModel
   public DateTime NgayMoSo { get; set; }
   public DateTime NgayDaoHan { get; set; }
   public decimal LaiSuatKyHan { get; set; }
+  public bool TrangThai { get; set; }
 
   [Required(ErrorMessage = "Vui lòng nhập số tiền muốn rút")]
   [Range(100000, double.MaxValue, ErrorMessage = "Số tiền rút tối thiểu là 100,000 VNĐ")]

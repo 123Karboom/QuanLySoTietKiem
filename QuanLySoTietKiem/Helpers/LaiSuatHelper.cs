@@ -7,7 +7,7 @@ public static class LaiSuatHelper
 
   public static decimal TinhTienLai(decimal soTienGui, decimal laiSuat, int soNgayGui)
   {
-    var result = soTienGui * (laiSuat) * (soNgayGui / 365m);
+    var result = soTienGui * (laiSuat / 100) * (soNgayGui / 365m);
     return result;
   }
 

@@ -3,6 +3,16 @@
     Layout = "~/Views/Shared/_UserLayout.cshtml";
 
     <div class="container mt-5">
+        @* Show gun *@
+
+        <div class="text-center mb-4">
+            <h3 class="text-danger fw-bold animate__animated animate__fadeIn">
+                <i class="bi bi-piggy-bank me-2"></i>
+                Tiết kiệm dễ dàng – Tương lai vững vàng
+                <i class="bi bi-stars ms-2"></i>
+            </h3>
+            <p class="text-muted fst-italic">Khởi đầu cho những ước mơ của bạn</p>
+        </div>
         <div class="text-center text-green-500 alert alert-success">@ViewBag.ThongBao
             <p class="text-center ">Bây giờ là <span id="current-time">@DateTime.Now</span></p>
             <script>
@@ -11,6 +21,8 @@
                 }, 1000);
             </script>
         </div>
+
+
         <div class="row mt-3">
             <div class="col-md-4">
                 <div class="card shadow-sm">

@@ -414,7 +414,8 @@ namespace QuanLySoTietKiem.Controllers
                 NgayMoSo = soTietKiem.NgayMoSo,
                 NgayDaoHan = soTietKiem.NgayDaoHan,
                 LaiSuatKyHan = soTietKiem.LaiSuatKyHan,
-                Code = soTietKiem.Code
+                Code = soTietKiem.Code,
+                TrangThai = soTietKiem.TrangThai
             };
 
             // Tính lãi suất áp dụng cho sổ tiết kiệm
@@ -537,5 +538,22 @@ namespace QuanLySoTietKiem.Controllers
             }
         }
 
+        [HttpPost]
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> DeleteSavingsAccount(int id)
+        {
+            var soTietKiem = await _context.SoTietKiems.FindAsync(id);
+            if (soTietKiem == null)
+                return NotFound();
+            if (soTietKiem.TrangThai)
+            {
+                ModelState.AddModelError("", "Sổ tiết kiệm đang hoạt động, không thể xóa");
+                return View("Details", soTietKiem);
+            }
+
+            _context.SoTietKiems.Remove(soTietKiem);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
