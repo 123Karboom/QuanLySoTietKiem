@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using QuanLySoTietKiem.Models;
 using QuanLySoTietKiem.Models.AccountModels.ChangePasswordModel;
 using QuanLySoTietKiem.Services.Interfaces;
-
+using Microsoft.EntityFrameworkCore;
+using QuanLySoTietKiem.Data;
 
 namespace QuanLySoTietKiem.Controllers
 {
@@ -13,11 +14,14 @@ namespace QuanLySoTietKiem.Controllers
         private readonly ILogger<UserController> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ISoTietKiemService _soTietKiemService;
-        public UserController(ILogger<UserController> logger, UserManager<ApplicationUser> userManager, ISoTietKiemService soTietKiemService)
+        private readonly ApplicationDbContext _context;
+
+        public UserController(ILogger<UserController> logger, UserManager<ApplicationUser> userManager, ISoTietKiemService soTietKiemService, ApplicationDbContext context)
         {
             _logger = logger;
             _userManager = userManager;
             _soTietKiemService = soTietKiemService;
+            _context = context;
         }
 
         [HttpGet]
@@ -37,15 +41,83 @@ namespace QuanLySoTietKiem.Controllers
         public async Task<IActionResult> Dashboard()
         {
             var currentUser = await _userManager.GetUserAsync(User);
-            if (currentUser == null)
-            {
-                return RedirectToAction("Login", "Account");
-            }
-            // Hiển thị tổng số sổ tiết kiệm của người dùng
-            var count = await _soTietKiemService.CountSoTietKiem(currentUser.Id);
-            ViewBag.UserName = currentUser.FullName;
-            ViewBag.ThongBao = "Hello " + currentUser.FullName + " đã quay trở lại hệ thống 😊";
-            ViewBag.CountSoTietKiem = count;
+
+            // Thêm thống kê theo loại tiết kiệm
+            var savingTypeStats = await _context.SoTietKiems
+                .Where(s => s.UserId == currentUser.Id)
+                .Include(s => s.LoaiSoTietKiem)
+                .GroupBy(s => s.LoaiSoTietKiem.TenLoaiSo)
+                .Select(g => new
+                {
+                    Type = g.Key,
+                    Count = g.Count(),
+                    Amount = g.Sum(s => s.SoDuSoTietKiem)
+                })
+                .ToListAsync();
+
+            ViewBag.SavingTypes = savingTypeStats.Select(s => s.Type).ToList();
+            ViewBag.SavingTypeCounts = savingTypeStats.Select(s => s.Count).ToList();
+            ViewBag.SavingTypeAmounts = savingTypeStats.Select(s => s.Amount).ToList();
+
+            // Thêm thống kê tổng quan cho Polar Area Chart
+            var totalStats = await _context.SoTietKiems
+                .Where(s => s.UserId == currentUser.Id)
+                .GroupBy(s => s.TrangThai)
+                .Select(g => new
+                {
+                    Status = g.Key,
+                    Count = g.Count()
+                })
+                .ToListAsync();
+
+            ViewBag.ActiveAccounts = totalStats.FirstOrDefault(s => s.Status)?.Count ?? 0;
+            ViewBag.ClosedAccounts = totalStats.FirstOrDefault(s => !s.Status)?.Count ?? 0;
+
+            // Lấy thống kê theo tháng trong năm hiện tại
+            var currentYear = DateTime.Now.Year;
+            var monthlyStats = await _context.SoTietKiems
+                .Where(s => s.UserId == currentUser.Id && s.NgayMoSo.Year == currentYear)
+                .GroupBy(s => s.NgayMoSo.Month)
+                .Select(g => new
+                {
+                    Month = g.Key,
+                    OpenCount = g.Count(s => s.NgayMoSo.Month == g.Key),
+                    CloseCount = g.Count(s => s.NgayDongSo != null && s.NgayDongSo.Value.Month == g.Key)
+                })
+                .ToListAsync();
+
+            // Chuẩn bị dữ liệu cho biểu đồ theo tháng
+            var months = Enumerable.Range(1, 12);
+            var openData = months.Select(m => monthlyStats.FirstOrDefault(s => s.Month == m)?.OpenCount ?? 0).ToList();
+            var closeData = months.Select(m => monthlyStats.FirstOrDefault(s => s.Month == m)?.CloseCount ?? 0).ToList();
+
+            // Thống kê theo ngày trong tháng hiện tại
+            var currentMonth = DateTime.Now.Month;
+            var daysInMonth = DateTime.DaysInMonth(currentYear, currentMonth);
+            var dailyStats = await _context.SoTietKiems
+                .Where(s => s.UserId == currentUser.Id &&
+                            s.NgayMoSo.Year == currentYear &&
+                            s.NgayMoSo.Month == currentMonth)
+                .GroupBy(s => s.NgayMoSo.Day)
+                .Select(g => new
+                {
+                    Day = g.Key,
+                    OpenCount = g.Count(s => s.NgayMoSo.Day == g.Key),
+                    CloseCount = g.Count(s => s.NgayDongSo != null && s.NgayDongSo.Value.Day == g.Key)
+                })
+                .ToListAsync();
+
+            // Chuẩn bị dữ liệu cho biểu đồ theo ngày
+            var days = Enumerable.Range(1, daysInMonth);
+            var dailyOpenData = days.Select(d => dailyStats.FirstOrDefault(s => s.Day == d)?.OpenCount ?? 0).ToList();
+            var dailyCloseData = days.Select(d => dailyStats.FirstOrDefault(s => s.Day == d)?.CloseCount ?? 0).ToList();
+
+            ViewBag.MonthlyOpenData = openData;
+            ViewBag.MonthlyCloseData = closeData;
+            ViewBag.DailyOpenData = dailyOpenData;
+            ViewBag.DailyCloseData = dailyCloseData;
+            ViewBag.DaysInMonth = daysInMonth;
+
             return View();
         }
 
