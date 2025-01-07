@@ -199,7 +199,7 @@
                                 let total = context.dataset.data.reduce((a, b) => a + b, 0);
                                 let percentage = ((value * 100) / total).toFixed(1);
         @* let amount = @Json.Serialize(ViewBag.SavingTypeAmounts)[context.dataIndex]; *@
-                                        return [
+                                                                                                        return [
                                     `${label}: ${value} sổ (${percentage}%)`,
                                     `Tổng tiền: ${amount.toLocaleString('vi-VN')} VNĐ`
                                 ];
