@@ -8,7 +8,7 @@ namespace QuanLySoTietKiem.Models
         [MinLength(0), MaxLength(12)]
         public string CCCD { get; set; }
         [MinLength(0), MaxLength(50)]
-        public string Address { get; set; }
+        public string? Address { get; set; }
         [Required]
         [MinLength(0), MaxLength(50)]
         public string FullName { get; set; }

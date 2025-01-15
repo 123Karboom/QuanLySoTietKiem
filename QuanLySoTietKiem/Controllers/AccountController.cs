@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using QuanLySoTietKiem.Models;
 using QuanLySoTietKiem.Models.AccountModels.ChangePasswordModel;
@@ -34,11 +35,11 @@ namespace QuanLySoTietKiem.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginModel model)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return View(model);
             }
-            
+
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByNameAsync(model.UserName);
@@ -86,6 +87,81 @@ namespace QuanLySoTietKiem.Controllers
 
             return RedirectToAction("Index", "User");
         }
+
+        [HttpPost]
+        public IActionResult ExternalLogin(string provider)
+        {
+            // Request a redirect to the external login provider
+            var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { returnUrl = "/" });
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            return Challenge(properties, provider);
+        }
+
+        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = "/")
+        {
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                TempData["ErrorMessage"] = "Lỗi khi lấy thông tin đăng nhập từ Google.";
+                return RedirectToAction("Login");
+            }
+
+            // Sign in the user with external login provider
+            var result = await _signInManager.ExternalLoginSignInAsync(
+                info.LoginProvider,
+                info.ProviderKey,
+                isPersistent: false);
+
+            if (result.Succeeded)
+            {
+                return LocalRedirect(returnUrl);
+            }
+
+            // If user does not exist, create new user
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            var name = info.Principal.FindFirstValue(ClaimTypes.Name);
+
+            if (string.IsNullOrEmpty(email))
+            {
+                TempData["ErrorMessage"] = "Email không được cung cấp từ Google.";
+                return RedirectToAction("Login");
+            }
+
+            var user = new ApplicationUser
+            {
+                UserName = email,
+                Email = email,
+                FullName = name ?? email,
+                EmailConfirmed = true,
+                Address = "",
+                CCCD = "",
+                SoDuTaiKhoan = 0,
+            };
+
+            var createResult = await _userManager.CreateAsync(user);
+            if (createResult.Succeeded)
+            {
+                // Add user to "User" role
+                await _userManager.AddToRoleAsync(user, "User");
+
+                // Add the external login to the user
+                var addLoginResult = await _userManager.AddLoginAsync(user, info);
+                if (addLoginResult.Succeeded)
+                {
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    return LocalRedirect(returnUrl);
+                }
+            }
+
+            foreach (var error in createResult.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            TempData["ErrorMessage"] = "Lỗi khi tạo tài khoản mới.";
+            return RedirectToAction("Login");
+        }
+
 
         [HttpGet]
         public IActionResult Register()
@@ -154,6 +230,10 @@ namespace QuanLySoTietKiem.Controllers
             return View();
         }
         // Forgot password
-
+        [HttpGet]
+        public IActionResult DeleteAccount()
+        {
+            return View();
+        }
     }
 }

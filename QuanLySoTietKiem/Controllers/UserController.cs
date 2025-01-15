@@ -6,6 +6,7 @@ using QuanLySoTietKiem.Models.AccountModels.ChangePasswordModel;
 using QuanLySoTietKiem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using QuanLySoTietKiem.Data;
+using Microsoft.AspNetCore.Authentication;
 
 namespace QuanLySoTietKiem.Controllers
 {
@@ -28,8 +29,10 @@ namespace QuanLySoTietKiem.Controllers
         public async Task<IActionResult> Index()
         {
             var currentUser = await _userManager.GetUserAsync(User);
-            bool isRole = await _userManager.IsInRoleAsync(currentUser, "User");
-            Console.WriteLine(isRole);
+            if (currentUser == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
             if (await _userManager.IsInRoleAsync(currentUser, "Admin"))
             {
                 return RedirectToAction("Dashboard", "Admin");
@@ -41,7 +44,10 @@ namespace QuanLySoTietKiem.Controllers
         public async Task<IActionResult> Dashboard()
         {
             var currentUser = await _userManager.GetUserAsync(User);
-
+            if (currentUser == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
             // Thêm thống kê theo loại tiết kiệm
             var savingTypeStats = await _context.SoTietKiems
                 .Where(s => s.UserId == currentUser.Id)
@@ -207,6 +213,58 @@ namespace QuanLySoTietKiem.Controllers
             ViewBag.QuyDinh = "Quy định và điều khoản";
             return View();
         }
+        [HttpGet]
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> DeleteAccount()
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return NotFound("Không tìm thấy người dùng");
+            }
+            return View(currentUser);
+        }
+        [HttpPost]
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> DeleteAccount(string confirm)
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return NotFound("Không tìm thấy người dùng");
+            }
 
+            // Kiểm tra sổ tiết kiệm đang hoạt động
+            var accountSavings = await _soTietKiemService.IsSavingAccountActiveByUserId(currentUser.Id);
+            if (accountSavings)
+            {
+                TempData["ErrorMessage"] = "Không thể xóa tài khoản khi còn sổ tiết kiệm đang hoạt động";
+                return View(currentUser);
+            }
+
+            try
+            {
+                // Sign out trước khi xóa tài khoản
+                await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+
+                // Xóa tài khoản
+                var result = await _userManager.DeleteAsync(currentUser);
+                if (result.Succeeded)
+                {
+                    TempData["SuccessMessage"] = "Tài khoản đã được xóa thành công";
+                    return RedirectToAction("Login", "Account");
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Có lỗi xảy ra khi xóa tài khoản: " + ex.Message);
+            }
+            return View(currentUser);
+        }
     }
 }

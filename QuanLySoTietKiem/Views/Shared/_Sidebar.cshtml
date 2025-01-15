@@ -30,10 +30,28 @@
         </a>
         <ul class="dropdown-menu" aria-labelledby="profileDropdown">
             <li>
-                <a class="dropdown-item" asp-controller="User" asp-action="Profile">Xem thông tin</a>
+                <a class="dropdown-item" asp-controller="User" asp-action="Profile">
+                    <i class="bi bi-eye"></i>
+                    <span>Xem thông tin</span>
+                </a>
             </li>
             <li>
-                <a class="dropdown-item" asp-controller="User" asp-action="EditProfile">Chỉnh sửa thông tin</a>
+                <a class="dropdown-item" asp-controller="User" asp-action="EditProfile">
+                    <i class="bi bi-pencil"></i>
+                    <span>Chỉnh sửa thông tin</span>
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item" asp-controller="User" asp-action="ChangePassword">
+                    <i class="bi bi-key"></i>
+                    <span>Đổi mật khẩu</span>
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item" asp-controller="User" asp-action="DeleteAccount">
+                    <i class="bi bi-trash"></i>
+                    <span>Xóa tài khoản</span>
+                </a>
             </li>
         </ul>
     </li>
